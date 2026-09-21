@@ -283,10 +283,15 @@ export function workflowCommands(app: Command, host: Host) {
       "Retry using a recorded run's unchanged build and selection",
     )
     .option(
-      "--env-file <file>",
+      "--secrets-file <file>",
       "Project-relative dotenv file; only declared secret names are passed",
     )
-    .action((options) => run("run", options));
+    .action(({ secretsFile, ...options }) =>
+      run("run", {
+        ...options,
+        ...(secretsFile ? { envFile: secretsFile } : {}),
+      }),
+    );
   execution
     .command("status <id>")
     .description("Read the durable local run receipt")

@@ -223,3 +223,33 @@ test("runtime preparation requires network permission separately", async (t) => 
   assert.equal(r.ok, false);
   assert.equal(r.diagnostics[0].code, "PERMISSION");
 });
+
+test("CLI secret file is project-relative and is not parsed as a Node option", (t) => {
+  const f = fixture(t);
+  writeFileSync(
+    resolve(f.root, ".env"),
+    "DEMO_TOKEN=synthetic\nNOT_A_SOURCE_SECRET=withheld\nNODE_OPTIONS=--invalid-secret-sentinel\n",
+  );
+  const output = execFileSync(
+    process.execPath,
+    [
+      resolve("build/cli/cli/index.js"),
+      "--project",
+      f.root,
+      "--json",
+      "--no-input",
+      "run",
+      "--flow",
+      "customers",
+      "--run-id",
+      "cli-secrets",
+      "--secrets-file",
+      ".env",
+    ],
+    { encoding: "utf8" },
+  );
+  const result = JSON.parse(output);
+  assert.equal(result.ok, true, output);
+  assert.equal(result.result.status, "succeeded");
+  assert.ok(!output.includes("withheld"));
+});

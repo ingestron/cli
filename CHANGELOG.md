@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.12.1 — project-relative secret files
+
+- Use `run --secrets-file .env` instead of `--env-file`. Node interprets the old
+  flag before CLI startup; the new name preserves project-relative loading and
+  source-declared secret filtering. Core/MCP's `envFile` operation field is unchanged.
+- A subprocess regression verifies the option from outside the project directory.
+
 ## 0.12.0 — public source preview
 
 - Terminal and stdio MCP adapters consume the exact public `@ingestron/core@0.12.0` package.
