@@ -33,14 +33,14 @@ one matching version is installed; specify its exact reference if ambiguous.
 
 ## Plugins and local execution
 
-| Group             | Commands                                                                          | Purpose                                                                             |
-| ----------------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `plugin`          | `list`, `browse`, `info`, `versions`                                              | Inspect installed packages or explicitly query repository tags                      |
-| `plugin`          | `install`, `update`, `configure`, `migrate`, `pack-add`                           | Lock exact references and review project registration/selection                     |
-| `plugin`          | `scaffold`, `check`, `show`                                                       | Create a synthetic starter, check provider determinism, inspect configured commands |
-| `runtime`         | `prepare`                                                                         | Explicitly prepare/download dependencies for a compatible local provider            |
-| `run`             | `--action`, `--from`, `--provider`, `--flow`, `--run-id`, `--retry`, `--env-file` | Execute selected local work; default action is `run`                                |
-| `run status <id>` |                                                                                   | Inspect the durable local receipt                                                   |
+| Group             | Commands                                                                              | Purpose                                                                             |
+| ----------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `plugin`          | `list`, `browse`, `info`, `versions`                                                  | Inspect installed packages or explicitly query repository tags                      |
+| `plugin`          | `install`, `update`, `configure`, `migrate`, `pack-add`                               | Lock exact references and review project registration/selection                     |
+| `plugin`          | `scaffold`, `check`, `show`                                                           | Create a synthetic starter, check provider determinism, inspect configured commands |
+| `runtime`         | `prepare`                                                                             | Explicitly prepare/download dependencies for a compatible local provider            |
+| `run`             | `--action`, `--from`, `--provider`, `--flow`, `--run-id`, `--retry`, `--secrets-file` | Execute selected local work; default action is `run`                                |
+| `run status <id>` |                                                                                       | Inspect the durable local receipt                                                   |
 
 Provider package identity and project configuration name are different. See
 [plugins](plugins.md) for explicit references and `ingestron <namespace> …` commands.
