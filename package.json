@@ -1,0 +1,76 @@
+{
+  "name": "ingestron",
+  "version": "0.12.0",
+  "type": "module",
+  "description": "Build repeatable data pipelines from reviewed contracts and versioned standards.",
+  "license": "Apache-2.0",
+  "bin": {
+    "ingestron": "build/cli/cli/index.js"
+  },
+  "files": [
+    "build/cli/cli",
+    "build/cli/mcp",
+    "README.md",
+    "SECURITY.md",
+    "CHANGELOG.md",
+    "build/cli/version.js",
+    "build/cli/version.d.ts",
+    "LICENSE",
+    "NOTICE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "engines": {
+    "node": ">=22 <23"
+  },
+  "packageManager": "pnpm@10.15.0",
+  "scripts": {
+    "build": "node scripts/clean-build.mjs && tsc",
+    "test": "tsx --test --test-concurrency=1 test/unit/*.test.ts test/providers/*.test.ts test/integration/*.test.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "secrets:check": "node scripts/secrets.mjs",
+    "validate": "pnpm format:check && pnpm build && pnpm test && pnpm examples:check && pnpm secrets:check && pnpm docs:check && pnpm release:check && pnpm package:check",
+    "prepack": "pnpm build",
+    "package:check": "tsx scripts/package-check.ts",
+    "release:check": "node scripts/release-check.mjs",
+    "prepublishOnly": "node scripts/release-check.mjs --publish",
+    "docs:check": "node scripts/docs-check.mjs",
+    "examples:check": "node examples/quickstart.mjs",
+    "licences:inventory": "node scripts/licence-inventory.mjs"
+  },
+  "dependencies": {
+    "@clack/prompts": "1.7.0",
+    "@ingestron/core": "0.12.0",
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "commander": "15.0.0",
+    "yaml": "2.9.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.1",
+    "prettier": "3.9.6",
+    "tsx": "4.23.13",
+    "typescript": "7.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ingestron/cli.git"
+  },
+  "homepage": "https://ingestron.io",
+  "bugs": {
+    "url": "https://github.com/ingestron/cli/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "keywords": [
+    "ingestron",
+    "data-engineering",
+    "data-contracts",
+    "etl",
+    "elt",
+    "cli",
+    "mcp",
+    "code-generation"
+  ]
+}
