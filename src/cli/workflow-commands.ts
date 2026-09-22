@@ -307,7 +307,7 @@ export function workflowCommands(app: Command, host: Host) {
           validate: (value) =>
             /^(github|local|[\w.-]+\/[\w.-]+)$/.test(value ?? "")
               ? undefined
-              : "Use github, local or owner/repository",
+              : "Use files, github, local or owner/repository",
         }),
       );
     }

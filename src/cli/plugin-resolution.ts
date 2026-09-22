@@ -10,6 +10,11 @@ import { check, packageLock, Problem } from "@ingestron/core/adapter";
 import { coreVersion } from "../version.js";
 
 export const officialPlugins = {
+  files: {
+    repository: "ingestron/connectors",
+    path: "connectors/files/connector.yaml",
+    tagPrefix: "files-",
+  },
   github: {
     repository: "ingestron/connectors",
     path: "connectors/github/connector.yaml",
@@ -35,7 +40,7 @@ export function officialName(reference: string) {
   check(
     Object.hasOwn(officialPlugins, name),
     "PACKAGE",
-    `Unknown official plugin '${name}'. Use github, local, or an explicit owner/repository reference.`,
+    `Unknown official plugin '${name}'. Use files, github, local, or an explicit owner/repository reference.`,
   );
   check(
     extra === undefined &&
