@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.13.2
+
+- Keep official plugin names short in ordinary install/list output; exact references remain in verbose and JSON output.
+- Link help to complete walkthroughs and explain the separate provider-configuration step.
+- Summarise configured resources and show Python preparation/reuse details from the local provider.
+
 ## 0.13.1 — Node.js runtime compatibility
 
 - Require Node 22.12 or newer instead of excluding newer major versions. CI tests

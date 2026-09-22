@@ -3,6 +3,7 @@
  * serialise arbitrary plugin data or resolved bindings in the default summary. */
 import { friendlyReference } from "@ingestron/core/adapter";
 import { stringify } from "yaml";
+import { officialPlugins } from "./plugin-resolution.js";
 import type { Result } from "@ingestron/core";
 export function exitCode(result: Result): number {
   if (result.ok) return 0;
@@ -28,6 +29,20 @@ export function exitCode(result: Result): number {
 }
 const clean = (value: unknown): string =>
   String(value).replace(/[\u0000-\u001f\u007f-\u009f]/g, " ");
+function pluginLabel(reference: string): string {
+  for (const [name, entry] of Object.entries(officialPlugins)) {
+    const prefixes = [
+      `${entry.repository}/${entry.path}@`,
+      ...(name === "local" ? [`${entry.repository}@`] : []),
+    ];
+    for (const prefix of prefixes)
+      if (reference.startsWith(prefix)) {
+        const version = reference.slice(prefix.length);
+        if (/^\d+\.\d+\.\d+$/.test(version)) return `${name}@${version}`;
+      }
+  }
+  return friendlyReference(reference);
+}
 function lines(title: string, items: string[], empty: string) {
   if (!items.length) return empty;
   return `${title} (${items.length})\n${items
@@ -93,11 +108,11 @@ export function terminal(
         "\nInstall: ingestron plugin install <owner/repository>@<version>"
       );
     case "packages_install":
-      return `${value.cached ? "Using cached" : "Installed"} plugin ${clean(friendlyReference(args.reference ?? value.reference ?? "package"))}.${value.informationFile ? `\nPlugin information and licence evidence: ${clean(value.informationFile)}` : ""}`;
+      return `${value.cached ? "Using cached" : "Installed"} plugin ${clean(pluginLabel(args.reference ?? value.reference ?? "package"))}.\nUse --verbose for the exact reference and licence information.`;
     case "packages_list":
       return lines(
         "Installed plugins",
-        Object.keys(value.packages).map(friendlyReference),
+        Object.keys(value.packages).map(pluginLabel),
         "No plugins installed.\nNext: ingestron plugin install local",
       );
     case "source_list":
@@ -160,6 +175,16 @@ export function terminal(
     case "doctor":
       return `Project ${clean(value.project)} (${clean(value.environment)})\n${value.pending.length} unresolved inputs.\n${clean(value.platformAccess)}\nNext: ${clean(value.next)}`;
     case "runtime_prepare":
+      return (
+        `Runtime ${clean(value.status)} for ${value.flows.map(clean).join(", ")}.` +
+        (value.result?.flows ?? [])
+          .map(
+            (f: any) =>
+              `\n  ${clean(f.flow)}: Python ${clean(f.pythonVersion ?? "3.12")} (${f.reused ? "reused" : "prepared"})`,
+          )
+          .join("") +
+        `\nUse ingestron run status ${clean(value.id)} --verbose for environment paths and details.`
+      );
     case "run":
     case "run_status":
       return `Run ${clean(value.id)}: ${clean(value.status)} (${clean(value.action)}).\nTarget: ${clean(value.configuration)}; flows: ${value.flows.map(clean).join(", ")}.\nUse ingestron run status ${clean(value.id)} to inspect the receipt.`;
@@ -208,7 +233,21 @@ export function terminal(
     case "config_explain":
       return `Configuration: ${clean(value.path)} (${clean(value.environment)})\nUse --verbose to inspect declared and resolved values.`;
     case "resolve":
-      return `Resolved project ${clean(value.project.id)} (${value.flows.length} flows).\n${value.pending.length} unresolved inputs. Use --verbose to inspect configuration.`;
+      return (
+        `Project ${clean(value.project.id)} — resolved build configuration\n` +
+        `Providers: ${
+          Object.keys(value.project.providers?.configurations ?? {})
+            .map(clean)
+            .join(", ") || "none"
+        }\n` +
+        `Connections: ${
+          Object.keys(value.project.connections ?? {})
+            .map(clean)
+            .join(", ") || "none"
+        }\n` +
+        `Flows: ${value.flows.length}; unresolved inputs: ${value.pending.length}.\n` +
+        "Authored files: ingestron source list; ingestron contract list.\nUse --verbose for resolved configuration and input-file digests."
+      );
     case "read":
       return value.content;
     case "schema":

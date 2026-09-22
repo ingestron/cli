@@ -590,6 +590,6 @@ export function workflowCommands(app: Command, host: Host) {
   });
   app.addHelpText(
     "after",
-    "\nStart: init → plugin install → source import → contract draft → flow add → check → build\nUse --json for automation; --verbose for detailed terminal output.",
+    "\nStart with a complete walkthrough: https://docs.ingestron.io/docs/start/first-contract\nRun a public GitHub example: https://docs.ingestron.io/docs/tutorials/github-to-parquet\nPlugin installation caches packages; use plugin configure to add a provider to your project.\nUse --json for automation; --verbose for detailed terminal output.",
   );
 }
