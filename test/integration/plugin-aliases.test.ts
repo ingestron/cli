@@ -232,3 +232,52 @@ test("files alias resolves only its qualified source identity", () => {
     ),
   );
 });
+
+test("Azure Blob short references preserve source identity and qualified latest selection", async (t) => {
+  const f = fixture(t);
+  const context = { root: f.root, allowWrite: true, allowNetwork: true };
+  const entry = {
+    ...officialPlugins["azure-blob"],
+    releases: [{ version: "1.0.0", coreVersions: [coreVersion] }],
+  };
+  const value = {
+    apiVersion: "ingestron.catalogue/v1",
+    plugins: { "azure-blob": entry },
+  };
+  for (const reference of [
+    "azure-blob",
+    "azure-blob@latest",
+    "azure-blob@1.0.0",
+  ]) {
+    const args = await resolvePluginArgs(
+      context,
+      "packages_install",
+      { reference },
+      async () => value,
+    );
+    assert.equal(
+      args.reference,
+      "ingestron/connectors/connectors/azure-blob/connector.yaml@1.0.0",
+    );
+    assert.equal(args.tagPrefix, "azure-blob-");
+  }
+  await assert.rejects(
+    resolvePluginArgs(
+      context,
+      "packages_install",
+      { reference: "azure-blob", tagPrefix: "other-" },
+      async () => value,
+    ),
+  );
+  for (const change of [
+    { path: "other.yaml" },
+    { repository: "third/party" },
+    { tagPrefix: "files-" },
+  ])
+    assert.throws(() =>
+      catalogueReleases(
+        { ...value, plugins: { "azure-blob": { ...entry, ...change } } },
+        "azure-blob",
+      ),
+    );
+});

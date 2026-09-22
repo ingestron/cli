@@ -24,7 +24,7 @@ Preserve upstream notices. This is the one active CLI source repository.
 
 Core resolves explicit owner/repository@version or full manifest references.
 Plugin browsing shows installed packages only. Do not reintroduce private product
-aliases or an upstream marketplace into core. Official github/local aliases resolve in the shared CLI/MCP adapter using qualified
+aliases or an upstream marketplace into core. Official azure-blob/files/github/local aliases resolve in the shared CLI/MCP adapter using qualified
 metadata from ingestron/connectors/catalogue.json. Keep this catalogue outside core;
 installation caches exact locks and never configures the project implicitly.
 

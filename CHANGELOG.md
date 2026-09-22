@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.14.1
+
+- Add `azure-blob` and `azure-blob@1.0.0` shortcuts, including qualified latest selection and MCP parity. No tag-prefix option is needed.
+- Derive official-name help from the shared alias map and suggest checking/updating the CLI when a name is unknown.
+
 ## 0.14.0
 
 - Add the official `files` plugin alias to CLI and MCP, with exact qualified catalogue resolution and unchanged cache-only installation.
