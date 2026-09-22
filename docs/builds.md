@@ -51,7 +51,7 @@ plan; stale plans fail. There is no remote deployment drift lookup.
 
 | Symptom                       | Next step                                                                                          |
 | ----------------------------- | -------------------------------------------------------------------------------------------------- |
-| Missing provider/package      | Install the exact reviewed reference; use `--cache-only --frozen` to restore an existing lock      |
+| Missing provider/package      | Install the exact reviewed reference; use `--frozen` to restore an existing lock                   |
 | Unresolved environment input  | Inspect `check --setup` and set the documented non-secret binding/value                            |
 | Invalid contract/type         | Run `contract check <id>`; use `--native` to test flat-table eligibility                           |
 | Stale plan or source snapshot | Re-import changed source metadata or create a fresh build plan after review                        |

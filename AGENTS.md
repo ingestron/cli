@@ -24,8 +24,9 @@ Preserve upstream notices. This is the one active CLI source repository.
 
 Core resolves explicit owner/repository@version or full manifest references.
 Plugin browsing shows installed packages only. Do not reintroduce private product
-aliases or an upstream marketplace into core. Any future public registry belongs
-outside core and must share reviewed metadata across application adapters.
+aliases or an upstream marketplace into core. Official github/local aliases resolve in the shared CLI/MCP adapter using qualified
+metadata from ingestron/connectors/catalogue.json. Keep this catalogue outside core;
+installation caches exact locks and never configures the project implicitly.
 
 Explicit execution lives in the separate execution operation boundary. Build/planning
 remain offline. CLI/MCP execution requires explicit authority; MCP needs its own

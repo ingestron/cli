@@ -272,6 +272,15 @@ test("provider-neutral init then plugin registration is idempotent and protects 
     resolve(f.root, "fixture-origin"),
   );
   assert.equal(installed.status, 0, installed.stdout);
+  assert.equal(
+    parse(readFileSync(resolve(fresh, "project.yaml"), "utf8")).defaults
+      .provider,
+    undefined,
+  );
+  assert.equal(
+    json(fresh, "plugin", "configure", "example/fixture@1.0.0").status,
+    0,
+  );
   const project = parse(readFileSync(resolve(fresh, "project.yaml"), "utf8"));
   assert.equal(project.defaults.provider, "databricks");
   assert.equal(
