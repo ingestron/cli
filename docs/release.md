@@ -1,6 +1,6 @@
 # Release the CLI
 
-Use Node 22 and pnpm 10.15.0. The package is `ingestron`; original code is
+Use Node 22.12 or newer and pnpm 10.15.0. The package is `ingestron`; original code is
 Apache-2.0, licensed by Otrera Limited. The core dependency must be an exact public
 npm version, with matching registry integrity in `pnpm-lock.yaml`.
 

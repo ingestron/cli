@@ -10,7 +10,7 @@ the CLI does not install a platform provider or connect to a cloud account.
 
 ## Get started
 
-Use Node 22, Git and pnpm 10.15.0. Build the public source:
+Use Node 22.12 or newer, Git and pnpm 10.15.0. Build the public source:
 
 ```sh
 git clone https://github.com/ingestron/cli.git
@@ -29,13 +29,13 @@ To install this checkout's CLI in your terminal:
 
 ```sh
 pnpm pack --pack-destination build/release
-npm install --global ./build/release/ingestron-0.13.0.tgz
+npm install --global ./build/release/ingestron-0.13.1.tgz
 ingestron --version
 ```
 
 This source release prepares the npm package named `ingestron`; it does not claim
 that the same CLI version is already published on npm. Its core dependency is the
-public, exact version `@ingestron/core@0.12.0`.
+public, exact version `@ingestron/core@0.12.1`.
 
 Follow the [five-minute quickstart](docs/quickstart.md) for a project you can keep.
 

@@ -6,7 +6,7 @@ semantics, plugin host and generated-file protection. Consume its immutable vers
 no compiler copies, workspace package or sibling source imports belong here.
 Native generators and standards remain in registered provider repositories.
 
-Use Node 22 and pnpm 10.15.0. Work on scoped codex/ branches. Run pnpm validate
+Use Node 22.12 or newer and pnpm 10.15.0. Work on scoped codex/ branches. Run pnpm validate
 before delivery. Preserve unrelated changes and generated-file ownership.
 
 Never connect to ADF, Databricks, Fabric or source data from the compiler/tests.
