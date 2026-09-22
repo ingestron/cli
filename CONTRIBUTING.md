@@ -1,6 +1,6 @@
 # Contributing
 
-Use Node 22 and pnpm 10.15.0. After cloning this repository:
+Use Node 22.12 or newer and pnpm 10.15.0. After cloning this repository:
 
 ```sh
 pnpm install --frozen-lockfile

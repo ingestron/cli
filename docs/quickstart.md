@@ -1,7 +1,7 @@
 # Create and review your first contract
 
 In about five minutes, create an Ingestron project, import synthetic metadata and
-review a draft contract. You need Node 22 and the CLI installed from the source
+review a draft contract. You need Node 22.12 or newer and the CLI installed from the source
 archive as described in the [README](../README.md). No plugin, credentials, source
 connection or cloud resources are needed.
 

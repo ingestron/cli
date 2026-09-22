@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.13.1 — Node.js runtime compatibility
+
+- Require Node 22.12 or newer instead of excluding newer major versions. CI tests
+  Node 22.12.0, 22.23.2 and 24.12.0, including installed CLI and MCP workflows.
+- Pin core 0.12.1 so the transitive core package no longer warns on Node 24.
+
 ## 0.13.0 — simpler plugin installation
 
 - CLI and MCP resolve official `github` and `local` names through shared adapter logic.

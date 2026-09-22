@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { spawnSync } from "node:child_process";
+import { coreVersion } from "../../src/version.js";
 import { fixture } from "../support/project.js";
 import { packageLock } from "@ingestron/core/adapter";
 import {
@@ -18,8 +19,8 @@ const catalogue = {
     local: {
       ...officialPlugins.local,
       releases: [
-        { version: "0.4.0", coreVersions: ["0.12.0"] },
-        { version: "0.10.0", coreVersions: ["0.12.0"] },
+        { version: "0.4.0", coreVersions: [coreVersion] },
+        { version: "0.10.0", coreVersions: [coreVersion] },
         { version: "1.0.0", coreVersions: ["9.0.0"] },
       ],
     },
@@ -32,7 +33,7 @@ test("catalogue selects qualified compatible stable versions and rejects changed
   for (const change of [
     { repository: "other/repo" },
     { path: "another.yaml" },
-    { releases: [{ version: "1.0.0-beta", coreVersions: ["0.12.0"] }] },
+    { releases: [{ version: "1.0.0-beta", coreVersions: [coreVersion] }] },
     {
       releases: [
         catalogue.plugins.local.releases[0],
