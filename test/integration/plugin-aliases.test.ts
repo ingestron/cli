@@ -203,3 +203,32 @@ test("CLI cache-only default and shared MCP resolver preserve configuration and 
   assert.equal(bad.ok, false);
   assert.equal(bad.diagnostics[0].code, "SCHEMA");
 });
+
+test("files alias resolves only its qualified source identity", () => {
+  assert.deepEqual(officialName("files"), {
+    name: "files",
+    version: undefined,
+  });
+  const entry = {
+    repository: "ingestron/connectors",
+    path: "connectors/files/connector.yaml",
+    tagPrefix: "files-",
+    releases: [{ version: "1.0.0", coreVersions: ["0.12.1"] }],
+  };
+  assert.deepEqual(
+    catalogueReleases(
+      { apiVersion: "ingestron.catalogue/v1", plugins: { files: entry } },
+      "files",
+    ),
+    ["1.0.0"],
+  );
+  assert.throws(() =>
+    catalogueReleases(
+      {
+        apiVersion: "ingestron.catalogue/v1",
+        plugins: { files: { ...entry, path: "other.yaml" } },
+      },
+      "files",
+    ),
+  );
+});

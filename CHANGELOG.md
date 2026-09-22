@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.14.0
+
+- Add the official `files` plugin alias to CLI and MCP, with exact qualified catalogue resolution and unchanged cache-only installation.
+- Keep core pinned to published 0.12.1; existing plugin identities and locks remain unchanged.
+
 ## 0.13.2
 
 - Keep official plugin names short in ordinary install/list output; exact references remain in verbose and JSON output.
