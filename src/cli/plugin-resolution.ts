@@ -10,6 +10,11 @@ import { check, packageLock, Problem } from "@ingestron/core/adapter";
 import { coreVersion } from "../version.js";
 
 export const officialPlugins = {
+  "azure-blob": {
+    repository: "ingestron/connectors",
+    path: "connectors/azure-blob/connector.yaml",
+    tagPrefix: "azure-blob-",
+  },
   files: {
     repository: "ingestron/connectors",
     path: "connectors/files/connector.yaml",
@@ -40,7 +45,7 @@ export function officialName(reference: string) {
   check(
     Object.hasOwn(officialPlugins, name),
     "PACKAGE",
-    `Unknown official plugin '${name}'. Use files, github, local, or an explicit owner/repository reference.`,
+    `Unknown official plugin '${name}'. Use ${Object.keys(officialPlugins).join(", ")}, or an explicit owner/repository reference. Check ingestron --version and update the CLI if a documented name is missing.`,
   );
   check(
     extra === undefined &&

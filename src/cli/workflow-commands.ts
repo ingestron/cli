@@ -1,4 +1,4 @@
-import { officialName } from "./plugin-resolution.js";
+import { officialName, officialPlugins } from "./plugin-resolution.js";
 import { browsePlugins } from "./plugin-browser.js";
 import * as prompts from "@clack/prompts";
 import { friendlyReference } from "@ingestron/core/adapter";
@@ -307,7 +307,7 @@ export function workflowCommands(app: Command, host: Host) {
           validate: (value) =>
             /^(github|local|[\w.-]+\/[\w.-]+)$/.test(value ?? "")
               ? undefined
-              : "Use files, github, local or owner/repository",
+              : `Use ${Object.keys(officialPlugins).join(", ")} or owner/repository`,
         }),
       );
     }
