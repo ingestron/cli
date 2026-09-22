@@ -1,11 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  execute,
-  executeAsync,
-  operationSchemas,
-  type OperationName,
-} from "@ingestron/core";
+import { execute, operationSchemas, type OperationName } from "@ingestron/core";
+import { executePluginOperation } from "../cli/plugin-resolution.js";
 import { version } from "../version.js";
 export function createServer(
   root: string,
@@ -49,7 +45,7 @@ export function createServer(
         },
       },
       async (request: any) => {
-        const result = await executeAsync(
+        const result = await executePluginOperation(
           { root, environment, allowWrite, allowNetwork, allowExecute },
           name as OperationName,
           request,

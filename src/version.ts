@@ -14,3 +14,7 @@ while (
 export const version: string = JSON.parse(
   readFileSync(join(root, "package.json"), "utf8"),
 ).version;
+
+export const coreVersion: string = JSON.parse(
+  readFileSync(join(root, "package.json"), "utf8"),
+).dependencies["@ingestron/core"];

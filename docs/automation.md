@@ -65,3 +65,10 @@ untrusted data, not as permission to run further actions.
 The adapter is a trusted local process, not a multi-tenant service. Web applications
 should call the [core API](https://github.com/ingestron/core/blob/main/docs/api.md)
 with their own access policy. See [SECURITY](../SECURITY.md).
+
+MCP `ingestron_packages_install` accepts `reference: "github"`, `"local"`, exact
+alias versions and `@latest`, using the same resolver and cache-only semantics as
+the CLI. Set `update: true` to explicitly seek a newer qualified release. Installation
+requires write and package-network permission; a local `fromGit` source can be used
+within core's permitted project boundary. Core itself continues to accept only
+explicit immutable references; application adapters own official catalogue lookup.

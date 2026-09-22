@@ -100,6 +100,56 @@ try {
     await client.close();
   }
   console.log("Installed CLI stdio MCP permission boundary passed");
+  const beforeAlias = readFileSync(resolve(f.root, "project.yaml"), "utf8");
+  const writer = new Client({
+    name: "installed-alias-check",
+    version: "1.0.0",
+  });
+  try {
+    await writer.connect(
+      new StdioClientTransport({
+        command: process.execPath,
+        args: [
+          cli,
+          "--project",
+          f.root,
+          "advanced",
+          "mcp",
+          "serve",
+          "--allow-write",
+          "--allow-network",
+        ],
+        stderr: "pipe",
+      }),
+    );
+    const installed: any = await writer.callTool({
+      name: "ingestron_packages_install",
+      arguments: {
+        reference: "local@1.0.0",
+        fromGit: resolve(f.root, "fixture-origin"),
+      },
+    });
+    const result = JSON.parse(installed.content[0].text);
+    assert.equal(result.ok, true, JSON.stringify(result));
+    assert.equal(
+      result.result.reference,
+      "ingestron/provider-local/plugin/provider.yaml@1.0.0",
+    );
+    assert.equal(
+      readFileSync(resolve(f.root, "project.yaml"), "utf8"),
+      beforeAlias,
+    );
+    const repeated: any = await writer.callTool({
+      name: "ingestron_packages_install",
+      arguments: { reference: "local", frozen: true },
+    });
+    assert.equal(JSON.parse(repeated.content[0].text).result.cached, true);
+  } finally {
+    await writer.close();
+  }
+  console.log(
+    "Installed MCP alias resolution and cache-only project boundary passed",
+  );
   const run = (project: string, ...args: string[]) => {
     const result = JSON.parse(
       execFileSync(

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.13.0 — simpler plugin installation
+
+- CLI and MCP resolve official `github` and `local` names through shared adapter logic.
+  Omitted versions and `@latest` select qualified compatible releases, then pin exact
+  versions/commits. Repeated installs reuse locks; updates are explicit.
+- Installation now only caches packages. Register project providers separately with
+  `plugin configure`; `--cache-only` remains accepted and `install --name` gives a
+  migration diagnostic. Existing full references and custom tag prefixes still work.
+- Core remains pinned at 0.12.0; no source/provider runtime change is required.
+
 ## 0.12.1 — project-relative secret files
 
 - Use `run --secrets-file .env` instead of `--env-file`. Node interprets the old

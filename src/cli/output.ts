@@ -76,7 +76,7 @@ export function terminal(
               )
               .join("\n\n")
           : "No installed plugins match this search.") +
-        "\n\nBrowse versions: ingestron plugin versions <owner/repository>\nGuided install: ingestron plugin install\nInstall: ingestron plugin install owner/repository@1.2.3"
+        "\n\nBrowse versions: ingestron plugin versions github\nGuided install: ingestron plugin install\nInstall: ingestron plugin install github"
       );
     case "plugin_versions":
       return (
@@ -98,7 +98,7 @@ export function terminal(
       return lines(
         "Installed plugins",
         Object.keys(value.packages).map(friendlyReference),
-        "No plugins installed.\nNext: ingestron plugin install <owner/repository>@<version>",
+        "No plugins installed.\nNext: ingestron plugin install local",
       );
     case "source_list":
       return lines(

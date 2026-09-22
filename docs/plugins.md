@@ -4,10 +4,41 @@ Plugins supply platform generators, connector definitions, standards and other
 versioned capabilities. The CLI hosts their commands through core; it contains no
 bundled marketplace or platform implementation.
 
-## Choose an exact package
+## Install an official plugin
 
-Use a compatible GitHub repository you can access. The following is a placeholder,
-not an Ingestron-hosted package:
+```sh
+ingestron plugin install local
+ingestron plugin install github
+```
+
+Official names resolve through the small [qualified release catalogue](https://github.com/ingestron/connectors/blob/main/catalogue.json).
+On first installation, an omitted version or `@latest` selects the newest catalogue
+release qualified with this CLI's pinned core. The result records an exact version,
+Git commit and file digests in `packages.lock.yaml`. Commit that lock. Catalogue
+metadata is fetched only when resolving a new latest selection; it contains no code.
+If it is unavailable, retry or specify an exact version.
+
+Installation caches the package under `.ingestron/packages/` in the selected project
+(or current directory). It does **not** edit `project.yaml`, create a connection or
+execute the plugin. `--cache-only` remains accepted but is no longer needed.
+
+```sh
+ingestron plugin install github@1.32.1
+ingestron plugin install local@0.4.0
+ingestron plugin install github --frozen
+ingestron plugin update github
+```
+
+Repeated installation, including `@latest`, reuses the highest exact stable version
+already locked for that official plugin. `--frozen` requires an existing lock;
+it never consults the catalogue. `update` explicitly checks the catalogue for a newer
+compatible release and caches it alongside existing versions. It never downgrades
+or retargets an existing version lock, and does not change project selections.
+Builds and runs keep using their configured exact references.
+
+## Other packages and development
+
+Explicit references remain supported:
 
 ```text
 ingestron plugin versions owner/repository
@@ -15,20 +46,21 @@ ingestron plugin install owner/repository@1.2.3
 ```
 
 `plugin/provider.yaml` is the default manifest. Other packages use an explicit
-path such as `owner/repository/packs/model.yaml@1.2.3`. A 40-character Git commit is
-also accepted. `@latest` and product aliases such as `adf@1.2.3` are not resolved.
-For independently tagged components, provide `--tag-prefix <prefix>` to both
-version lookup and initial installation. Git tag listing is not compatibility proof.
+path such as `owner/repository/packs/model.yaml@1.2.3`; 40-character Git commits
+also work. Shared repositories can use `--tag-prefix <prefix>`. Official `github`
+and `local` names supply their paths/prefixes automatically. No other aliases or
+`@latest` resolution for arbitrary repositories are implied.
 
-Interactive `plugin install` asks for a repository and an exact version.
-Automation must supply the exact reference and should use `--no-input`. Private
-Git repositories require your existing authorised GitHub credentials; public
-repositories do not require private core access.
+`plugin versions github` lists source-specific Git tags, including releases not
+qualified in the catalogue. Listing is not compatibility proof. Interactive
+`plugin install` asks for an official name or a repository; repositories require
+selection of an exact tag. Automation can use names, but should pin exact versions
+and use `--frozen` for reproducible restoration.
 
-Installation writes `.ingestron/packages/` and `packages.lock.yaml`. Commit the lock.
-`--cache-only` skips project registration; `--frozen` restores an existing lock
-without changing its selected commit. `--from-git <directory>` uses a local Git
-repository for development. Installation never runs a package's install hooks.
+`--from-git <directory>` with an exact version uses a local Git repository for
+development. Private repositories use your existing authorised GitHub credentials.
+Installation does not run package install hooks. Existing full-reference behaviour
+is retained; prefer official names for qualified version selection.
 
 ## Configure and inspect
 
@@ -45,8 +77,10 @@ not mean GitHub was searched. `info` describes package metadata; `show` describe
 configured provider's operation capabilities. A failed registration can leave a
 valid cache/lock; resolve its configuration conflict and retry `plugin configure`.
 
-Use `plugin configure <reference> --name <configuration>` to register a cached
-provider. Multiple configurations can use the same package. `plugin migrate
+Use `plugin configure <exact-reference> --name <configuration>` to register a cached
+provider. Use the full resolved reference printed by installation or `plugin list`.
+The former `plugin install --name` option now reports this separate configuration step.
+Multiple configurations can use the same package. `plugin migrate
 --from <package-key> --to <reference>` changes an existing selection; preview with
 `--dry-run`, then regenerate and review changed output. Model/activity presets can
 be attached with `plugin pack-add`; the package owns its supported contract.

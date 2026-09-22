@@ -1,16 +1,9 @@
+import { officialName } from "./plugin-resolution.js";
 import { browsePlugins } from "./plugin-browser.js";
 import * as prompts from "@clack/prompts";
 import { friendlyReference } from "@ingestron/core/adapter";
 import { Command } from "commander";
-import { existsSync } from "node:fs";
-import { resolve } from "node:path";
-import { packageYaml, resolvePackage } from "@ingestron/core/adapter";
-import {
-  execute,
-  type Context,
-  type OperationName,
-  type Result,
-} from "@ingestron/core";
+import { type Context, type OperationName, type Result } from "@ingestron/core";
 import { check } from "@ingestron/core/adapter";
 interface Host {
   context: () => Context;
@@ -302,27 +295,34 @@ export function workflowCommands(app: Command, host: Host) {
     options: any,
     update = false,
   ) => {
-    if (!reference || !reference.includes("@")) {
+    if (!reference) {
       check(
         canPrompt(),
         "INPUT",
-        "Choose an exact reference, e.g. plugin install owner/repository@1.2.3. Use plugin versions owner/repository to inspect tags.",
+        "Choose an official plugin: plugin install github or plugin install local; explicit owner/repository@version references also work.",
+      );
+      reference = await answer(
+        prompts.text({
+          message: "Official plugin name or owner/repository",
+          validate: (value) =>
+            /^(github|local|[\w.-]+\/[\w.-]+)$/.test(value ?? "")
+              ? undefined
+              : "Use github, local or owner/repository",
+        }),
+      );
+    }
+    check(typeof reference === "string", "INPUT", "Choose a plugin reference");
+    if (reference.includes("/") && !reference.includes("@")) {
+      check(
+        canPrompt(),
+        "INPUT",
+        "Explicit repositories require an exact version: owner/repository@1.2.3. Official names github and local can omit the version.",
       );
       check(
         !options.frozen,
         "OPTION",
         "Frozen installation requires an exact locked reference",
       );
-      if (!reference)
-        reference = await answer(
-          prompts.text({
-            message: "Plugin GitHub repository (owner/repository)",
-            validate: (value) =>
-              /^[\w.-]+\/[\w.-]+$/.test(value ?? "")
-                ? undefined
-                : "Use owner/repository",
-          }),
-        );
       const available = await perform(
         "plugin_versions",
         {
@@ -357,6 +357,12 @@ export function workflowCommands(app: Command, host: Host) {
       );
     }
     check(typeof reference === "string", "INPUT", "Choose a provider version");
+    officialName(reference);
+    check(
+      !options.name,
+      "OPTION",
+      "Installation no longer configures projects. Use plugin configure <exact-reference> --name <configuration>.",
+    );
     const result = await perform(
       "packages_install",
       {
@@ -372,48 +378,7 @@ export function workflowCommands(app: Command, host: Host) {
       print(result);
       return;
     }
-    const provider = [
-      "ingestron.provider/v1",
-      "ingestron.connector/v1",
-    ].includes(
-      packageYaml(resolvePackage(context().root, result.result.reference).file)
-        .apiVersion,
-    );
-    if (
-      options.cacheOnly ||
-      !provider ||
-      !existsSync(resolve(context().root, "project.yaml"))
-    ) {
-      print(result, { reference });
-      return;
-    }
-    const proposal = execute(context(), "plugin_configure", {
-      reference,
-      update,
-      ...(options.name ? { name: options.name } : {}),
-    });
-    if (!proposal.ok) {
-      print(proposal);
-      return;
-    }
-    const applied = execute(context(), "apply", {
-      proposal: proposal.result,
-    });
-    if (!applied.ok) {
-      print(applied);
-      return;
-    }
-    print(
-      {
-        ...result,
-        result: {
-          ...result.result,
-          configured: true,
-          files: applied.result.files,
-        },
-      },
-      { reference },
-    );
+    print(result, { reference: result.result.reference });
   };
   const plugin = app
     .command("plugin")
@@ -463,7 +428,7 @@ export function workflowCommands(app: Command, host: Host) {
   plugin
     .command("versions <provider>")
     .description(
-      "List exact version tags from GitHub; supports owner/repository",
+      "List stable tags for an official name or owner/repository; compatibility checked at install",
     )
     .option("--from-git <directory>", "Inspect a local Git repository")
     .option(
@@ -487,7 +452,7 @@ export function workflowCommands(app: Command, host: Host) {
     plugin
       .command(`${update ? "update <reference>" : "install [reference]"}`)
       .description(
-        "Install an exact version or choose interactively; register provider defaults",
+        "Cache a plugin without changing project configuration; official names default to latest qualified",
       )
       .option("--from-git <directory>", "Local Git source")
       .option(
@@ -497,11 +462,11 @@ export function workflowCommands(app: Command, host: Host) {
       .option("--frozen", "Require an existing immutable lock")
       .option(
         "--name <configuration>",
-        "Provider configuration name (default: platform name)",
+        "Removed: use plugin configure --name instead",
       )
       .option(
         "--cache-only",
-        "Install without changing project provider configuration",
+        "Compatibility option; cache-only is now the default",
       )
       .action((reference, options) =>
         installProvider(reference, options, update),

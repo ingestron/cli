@@ -29,7 +29,7 @@ To install this checkout's CLI in your terminal:
 
 ```sh
 pnpm pack --pack-destination build/release
-npm install --global ./build/release/ingestron-0.12.0.tgz
+npm install --global ./build/release/ingestron-0.13.0.tgz
 ingestron --version
 ```
 
@@ -45,12 +45,14 @@ Commands use resource groups such as `source`, `contract`, `flow`, `config` and
 `plugin`. Installed plugins can add their own namespace:
 
 ```text
-ingestron plugin install owner/repository@1.2.3
+ingestron plugin install local
+ingestron plugin install github
 ingestron <namespace> <resource> <verb> --input request.json
 ```
 
-The repository/version above is a placeholder: use a compatible plugin you can
-access. Browse installed packages with `ingestron plugin browse`. Command help
+Installation caches an exact, qualified version without changing project configuration.
+Use `github@1.32.1` for an explicit pin, or `plugin update github` to check for a newer
+qualified release. Browse installed packages with `ingestron plugin browse`. Command help
 shows the selected plugin's input schema without executing it.
 
 - [Command reference](docs/commands.md) — implemented groups, options and errors.
