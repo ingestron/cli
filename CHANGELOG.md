@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.15.1
+
+- Pin core 0.12.4 so CLI and MCP accept reusable connections with per-table source selectors; new projects start with short top-level package names.
+- Existing stream-based projects and exact package locks remain supported.
+
 ## 0.15.0
 
 - Add `provider install` and `connector install` with matching list/update commands. They use the existing immutable package cache and reject a package of the wrong type before changing the lock.

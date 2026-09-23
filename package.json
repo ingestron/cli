@@ -1,6 +1,6 @@
 {
   "name": "ingestron",
-  "version": "0.15.0",
+  "version": "0.15.1",
   "type": "module",
   "description": "Build repeatable data pipelines from reviewed contracts and versioned standards.",
   "license": "Apache-2.0",
@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "@clack/prompts": "1.7.0",
-    "@ingestron/core": "0.12.2",
+    "@ingestron/core": "0.12.4",
     "@modelcontextprotocol/sdk": "1.30.0",
     "commander": "15.0.0",
     "yaml": "2.9.0"
