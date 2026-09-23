@@ -35,7 +35,7 @@ ingestron --version
 
 This source release prepares the npm package named `ingestron`; it does not claim
 that the same CLI version is already published on npm. Its core dependency is the
-public, exact version `@ingestron/core@0.12.3`.
+public, exact version `@ingestron/core@0.12.4`.
 
 Follow the [five-minute quickstart](docs/quickstart.md) for a project you can keep.
 

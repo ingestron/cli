@@ -116,7 +116,8 @@ test("init honours environment selectors and writes editable provider YAML", asy
       assert.match(text, /^apiVersion: ingestron.project\/v1/m);
       const project = parse(text);
       assert.deepEqual(Object.keys(project.environments), expected);
-      assert.equal(project.providers.packages.native.version, "1.0.0");
+      assert.equal(project.packages.native, "fixture@1.0.0");
+      assert.equal(project.providers.packages, undefined);
       for (const name of expected) {
         const env = readFileSync(
           resolve(f.root, `environments/${name}.yaml`),
@@ -219,9 +220,9 @@ test("init refuses ambiguous installed versions but accepts an exact selection",
   );
   assert.equal(exact.status, 0, exact.stderr);
   assert.equal(
-    parse(readFileSync(resolve(f.root, "project.yaml"), "utf8")).providers
-      .packages.native.version,
-    "1.0.1",
+    parse(readFileSync(resolve(f.root, "project.yaml"), "utf8")).packages
+      .native,
+    "fixture@1.0.1",
   );
 });
 
