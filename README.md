@@ -29,13 +29,13 @@ To install this checkout's CLI in your terminal:
 
 ```sh
 pnpm pack --pack-destination build/release
-npm install --global ./build/release/ingestron-0.14.2.tgz
+npm install --global ./build/release/ingestron-0.15.1.tgz
 ingestron --version
 ```
 
 This source release prepares the npm package named `ingestron`; it does not claim
 that the same CLI version is already published on npm. Its core dependency is the
-public, exact version `@ingestron/core@0.12.2`.
+public, exact version `@ingestron/core@0.12.3`.
 
 Follow the [five-minute quickstart](docs/quickstart.md) for a project you can keep.
 
