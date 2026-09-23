@@ -290,25 +290,29 @@ export function workflowCommands(app: Command, host: Host) {
     .description("Read the durable local run receipt")
     .action((id) => run("run_status", { id }));
   // Installation is explicit; browsing only inspects installed packages.
-  const installProvider = async (
+  const installPlugin = async (
     reference: string | undefined,
     options: any,
     update = false,
+    kind?: "provider" | "connector",
   ) => {
+    const names = Object.entries(officialPlugins)
+      .filter(([, plugin]) => !kind || plugin.kind === kind)
+      .map(([name]) => name);
     if (!reference) {
       check(
         canPrompt(),
         "INPUT",
-        `Choose an official plugin: ${Object.keys(officialPlugins).join(", ")}; explicit owner/repository@version references also work.`,
+        `Choose an official ${kind ?? "plugin"}: ${names.join(", ")}; explicit owner/repository@version references also work.`,
       );
       reference = await answer(
         prompts.text({
-          message: "Official plugin name or owner/repository",
+          message: `Official ${kind ?? "plugin"} name or owner/repository`,
           validate: (value) =>
-            Object.hasOwn(officialPlugins, value ?? "") ||
+            names.includes(value ?? "") ||
             /^[\w.-]+\/[\w.-]+$/.test(value ?? "")
               ? undefined
-              : `Use ${Object.keys(officialPlugins).join(", ")} or owner/repository`,
+              : `Use ${names.join(", ")} or owner/repository`,
         }),
       );
     }
@@ -357,7 +361,7 @@ export function workflowCommands(app: Command, host: Host) {
         }),
       );
     }
-    check(typeof reference === "string", "INPUT", "Choose a provider version");
+    check(typeof reference === "string", "INPUT", "Choose a package version");
     officialName(reference);
     check(
       !options.name,
@@ -368,6 +372,7 @@ export function workflowCommands(app: Command, host: Host) {
       "packages_install",
       {
         reference,
+        ...(kind ? { kind } : {}),
         update,
         frozen: !!options.frozen,
         ...(options.fromGit ? { fromGit: options.fromGit } : {}),
@@ -379,7 +384,7 @@ export function workflowCommands(app: Command, host: Host) {
       print(result);
       return;
     }
-    print(result, { reference: result.result.reference });
+    print(result, { reference: result.result.reference, kind });
   };
   const plugin = app
     .command("plugin")
@@ -470,8 +475,37 @@ export function workflowCommands(app: Command, host: Host) {
         "Compatibility option; cache-only is now the default",
       )
       .action((reference, options) =>
-        installProvider(reference, options, update),
+        installPlugin(reference, options, update),
       );
+  const typedInstall = (group: Command, kind: "provider" | "connector") => {
+    for (const update of [false, true])
+      group
+        .command(`${update ? "update" : "install"} <reference>`)
+        .description(
+          `${update ? "Check for a newer" : "Cache and lock a"} ${kind} package without changing project configuration`,
+        )
+        .option("--from-git <directory>", "Local Git source")
+        .option(
+          "--tag-prefix <prefix>",
+          "Component tag prefix in a shared repository",
+        )
+        .option("--frozen", "Require an existing immutable lock")
+        .action((reference, options) =>
+          installPlugin(reference, options, update, kind),
+        );
+    group
+      .command("list")
+      .description(`List installed ${kind} packages`)
+      .action(() => run("plugin_browse", { kind }));
+  };
+  const provider = app.commands.find((c) => c.name() === "provider")!;
+  typedInstall(provider, "provider");
+  typedInstall(
+    app
+      .command("connector")
+      .description("Install and inspect source connectors"),
+    "connector",
+  );
   plugin
     .command("configure <reference>")
     .description("Register a cached provider with project configuration")

@@ -417,6 +417,12 @@ connections
 const providerCommands = app.commands.find(
   (command) => command.name() === "providers",
 )!;
+providerCommands.configureHelp({
+  visibleCommands: (command) =>
+    command.commands.filter(
+      (child) => !["install", "update"].includes(child.name()),
+    ),
+});
 for (const update of [false, true])
   providerCommands
     .command(`${update ? "update" : "install"} <reference>`)
@@ -439,10 +445,23 @@ providerCommands
     "List provider-owned commands and input schemas without executing plugin code",
   )
   .action((configuration) => run("provider_commands", { configuration }));
-app
-  .command("provider <configuration> <command...>")
+const provider = app
+  .command("provider")
+  .description("Install an execution provider or run its offline commands")
+  .arguments("<configuration> <command...>")
+  .option("--input <file>", "Project-relative JSON input file")
+  .option("--out <file>", "Save the provider result JSON to a new project file")
+  .action((configuration, words, command) =>
+    providerAction(
+      "provider_command",
+      { configuration, command: words.join(" ") },
+      command,
+    ),
+  );
+provider
+  .command("exec <configuration> <command...>")
   .description(
-    "Run an installed provider's offline command; inspect providers commands first",
+    "Run a configured provider command; inspect providers commands first",
   )
   .option("--input <file>", "Project-relative JSON input file")
   .option("--out <file>", "Save the provider result JSON to a new project file")

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.0
+
+- Add `provider install` and `connector install` with matching list/update commands. They use the existing immutable package cache and reject a package of the wrong type before changing the lock.
+- Move direct provider command execution to `provider exec`. Keep `plugin install` and the older `providers install` spelling for existing scripts.
+- Pin core 0.12.2 so connected flows can resolve reviewed model-pack contracts in the same way as planning.
+
 ## 0.14.2
 
 - Add the qualified `sql-server` source shortcut to CLI and MCP. `sql-server@1.0.0`

@@ -11,26 +11,31 @@ import { coreVersion } from "../version.js";
 
 export const officialPlugins = {
   "azure-blob": {
+    kind: "connector",
     repository: "ingestron/connectors",
     path: "connectors/azure-blob/connector.yaml",
     tagPrefix: "azure-blob-",
   },
   files: {
+    kind: "connector",
     repository: "ingestron/connectors",
     path: "connectors/files/connector.yaml",
     tagPrefix: "files-",
   },
   github: {
+    kind: "connector",
     repository: "ingestron/connectors",
     path: "connectors/github/connector.yaml",
     tagPrefix: "github-",
   },
   local: {
+    kind: "provider",
     repository: "ingestron/provider-local",
     path: "plugin/provider.yaml",
     tagPrefix: "",
   },
   "sql-server": {
+    kind: "connector",
     repository: "ingestron/connectors",
     path: "connectors/sql-server/connector.yaml",
     tagPrefix: "sql-server-",
@@ -152,6 +157,12 @@ export async function resolvePluginArgs(
   const alias = officialName(args[field]);
   if (!alias) return args;
   const identity = officialPlugins[alias.name];
+  if (operation === "packages_install" && args.kind)
+    check(
+      args.kind === identity.kind,
+      "PACKAGE",
+      `${alias.name} is a ${identity.kind}; use ingestron ${identity.kind} install ${alias.name}`,
+    );
   check(
     args.tagPrefix === undefined || args.tagPrefix === identity.tagPrefix,
     "OPTION",

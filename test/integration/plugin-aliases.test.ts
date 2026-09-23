@@ -74,6 +74,16 @@ test("latest resolution observes permissions, compatibility and frozen boundarie
   );
   assert.equal(args.update, false);
   assert.equal(calls, 1);
+  await assert.rejects(
+    resolvePluginArgs(
+      context,
+      "packages_install",
+      { reference: "local@0.4.1", kind: "connector" },
+      fetch,
+    ),
+    /local is a provider/,
+  );
+  assert.equal(calls, 1);
   for (const [ctx, options] of [
     [{ ...context, allowWrite: false }, {}],
     [{ ...context, allowNetwork: false }, {}],
@@ -203,6 +213,41 @@ test("CLI cache-only default and shared MCP resolver preserve configuration and 
   assert.equal(bad.ok, false);
   assert.equal(bad.diagnostics[0].code, "SCHEMA");
 });
+test("provider and connector install commands use one typed package operation", (t) => {
+  const f = fixture(t);
+  const run = (...args: string[]) =>
+    spawnSync(process.execPath, [cli, "--project", f.root, "--json", ...args], {
+      encoding: "utf8",
+      timeout: 20000,
+    });
+  for (const [kind, name] of [
+    ["provider", "github@1.33.0"],
+    ["connector", "local@1.0.0"],
+  ]) {
+    const rejected = run(kind, "install", name);
+    assert.notEqual(rejected.status, 0);
+    assert.equal(JSON.parse(rejected.stdout).diagnostics[0].code, "PACKAGE");
+  }
+  const installed = run(
+    "provider",
+    "install",
+    "local@1.0.0",
+    "--from-git",
+    resolve(f.root, "fixture-origin"),
+  );
+  assert.equal(installed.status, 0, installed.stdout + installed.stderr);
+  assert.equal(JSON.parse(installed.stdout).result.cached, false);
+  const list = run("provider", "list");
+  assert.equal(list.status, 0, list.stdout + list.stderr);
+  assert.ok(JSON.parse(list.stdout).result.length >= 1);
+  const wrong = run("connector", "install", "local@1.0.0", "--frozen");
+  assert.notEqual(wrong.status, 0);
+  assert.equal(JSON.parse(wrong.stdout).diagnostics[0].code, "PACKAGE");
+  const cached = run("provider", "install", "local@1.0.0", "--frozen");
+  assert.equal(cached.status, 0, cached.stdout + cached.stderr);
+  assert.equal(JSON.parse(cached.stdout).result.cached, true);
+  assert.equal(run("provider", "exec", "--help").status, 0);
+});
 
 test("files alias resolves only its qualified source identity", () => {
   assert.deepEqual(officialName("files"), {
@@ -213,7 +258,7 @@ test("files alias resolves only its qualified source identity", () => {
     repository: "ingestron/connectors",
     path: "connectors/files/connector.yaml",
     tagPrefix: "files-",
-    releases: [{ version: "1.0.0", coreVersions: ["0.12.1"] }],
+    releases: [{ version: "1.0.0", coreVersions: [coreVersion] }],
   };
   assert.deepEqual(
     catalogueReleases(

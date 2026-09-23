@@ -91,7 +91,7 @@ export function terminal(
               )
               .join("\n\n")
           : "No installed plugins match this search.") +
-        "\n\nBrowse versions: ingestron plugin versions github\nGuided install: ingestron plugin install\nInstall: ingestron plugin install github"
+        "\n\nInstall a provider: ingestron provider install local\nInstall a connector: ingestron connector install github"
       );
     case "plugin_versions":
       return (
@@ -108,12 +108,12 @@ export function terminal(
         "\nInstall: ingestron plugin install <owner/repository>@<version>"
       );
     case "packages_install":
-      return `${value.cached ? "Using cached" : "Installed"} plugin ${clean(pluginLabel(args.reference ?? value.reference ?? "package"))}.\nUse --verbose for the exact reference and licence information.`;
+      return `${value.cached ? "Using cached" : "Installed"} ${args.kind ?? "plugin"} ${clean(pluginLabel(args.reference ?? value.reference ?? "package"))}.\nUse --verbose for the exact reference and licence information.`;
     case "packages_list":
       return lines(
         "Installed plugins",
         Object.keys(value.packages).map(pluginLabel),
-        "No plugins installed.\nNext: ingestron plugin install local",
+        "No plugins installed.\nNext: ingestron provider install local",
       );
     case "source_list":
       return lines(
