@@ -1,6 +1,6 @@
 {
   "name": "ingestron",
-  "version": "0.14.1",
+  "version": "0.14.2",
   "type": "module",
   "description": "Build repeatable data pipelines from reviewed contracts and versioned standards.",
   "license": "Apache-2.0",

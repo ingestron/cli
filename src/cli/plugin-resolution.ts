@@ -30,6 +30,11 @@ export const officialPlugins = {
     path: "plugin/provider.yaml",
     tagPrefix: "",
   },
+  "sql-server": {
+    repository: "ingestron/connectors",
+    path: "connectors/sql-server/connector.yaml",
+    tagPrefix: "sql-server-",
+  },
 } as const;
 const catalogueUrl =
   "https://raw.githubusercontent.com/ingestron/connectors/main/catalogue.json";

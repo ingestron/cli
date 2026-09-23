@@ -9,6 +9,9 @@ bundled marketplace or platform implementation.
 ```sh
 ingestron plugin install local
 ingestron plugin install github
+ingestron plugin install files
+ingestron plugin install azure-blob
+ingestron plugin install sql-server@1.0.0
 ```
 
 Official names resolve through the small [qualified release catalogue](https://github.com/ingestron/connectors/blob/main/catalogue.json).
@@ -47,9 +50,9 @@ ingestron plugin install owner/repository@1.2.3
 
 `plugin/provider.yaml` is the default manifest. Other packages use an explicit
 path such as `owner/repository/packs/model.yaml@1.2.3`; 40-character Git commits
-also work. Shared repositories can use `--tag-prefix <prefix>`. Official `github`
-and `local` names supply their paths/prefixes automatically. No other aliases or
-`@latest` resolution for arbitrary repositories are implied.
+also work. Shared repositories can use `--tag-prefix <prefix>`. Official names
+supply their paths/prefixes automatically. No `@latest` resolution for arbitrary
+repositories is implied.
 
 `plugin versions github` lists source-specific Git tags, including releases not
 qualified in the catalogue. Listing is not compatibility proof. Interactive

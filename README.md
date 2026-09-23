@@ -29,7 +29,7 @@ To install this checkout's CLI in your terminal:
 
 ```sh
 pnpm pack --pack-destination build/release
-npm install --global ./build/release/ingestron-0.14.1.tgz
+npm install --global ./build/release/ingestron-0.14.2.tgz
 ingestron --version
 ```
 
