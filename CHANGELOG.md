@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.2
+
+- Add the qualified `sql-server` source shortcut to CLI and MCP. `sql-server@1.0.0`
+  resolves to its immutable source tag; installation still only caches the package.
+- Offer every current official plugin in the interactive install prompt.
+
 ## 0.14.1
 
 - Add `azure-blob` and `azure-blob@1.0.0` shortcuts, including qualified latest selection and MCP parity. No tag-prefix option is needed.

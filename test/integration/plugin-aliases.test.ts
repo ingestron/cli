@@ -281,3 +281,39 @@ test("Azure Blob short references preserve source identity and qualified latest 
       ),
     );
 });
+
+test("SQL Server short references resolve only the qualified source package", async (t) => {
+  const f = fixture(t);
+  const context = { root: f.root, allowWrite: true, allowNetwork: true };
+  const entry = {
+    ...officialPlugins["sql-server"],
+    releases: [{ version: "1.0.0", coreVersions: [coreVersion] }],
+  };
+  const value = {
+    apiVersion: "ingestron.catalogue/v1",
+    plugins: { "sql-server": entry },
+  };
+  for (const reference of [
+    "sql-server",
+    "sql-server@latest",
+    "sql-server@1.0.0",
+  ]) {
+    const args = await resolvePluginArgs(
+      context,
+      "packages_install",
+      { reference },
+      async () => value,
+    );
+    assert.equal(
+      args.reference,
+      "ingestron/connectors/connectors/sql-server/connector.yaml@1.0.0",
+    );
+    assert.equal(args.tagPrefix, "sql-server-");
+  }
+  assert.throws(() =>
+    catalogueReleases(
+      { ...value, plugins: { "sql-server": { ...entry, path: "wrong.yaml" } } },
+      "sql-server",
+    ),
+  );
+});

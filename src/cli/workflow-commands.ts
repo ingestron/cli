@@ -299,13 +299,14 @@ export function workflowCommands(app: Command, host: Host) {
       check(
         canPrompt(),
         "INPUT",
-        "Choose an official plugin: plugin install github or plugin install local; explicit owner/repository@version references also work.",
+        `Choose an official plugin: ${Object.keys(officialPlugins).join(", ")}; explicit owner/repository@version references also work.`,
       );
       reference = await answer(
         prompts.text({
           message: "Official plugin name or owner/repository",
           validate: (value) =>
-            /^(github|local|[\w.-]+\/[\w.-]+)$/.test(value ?? "")
+            Object.hasOwn(officialPlugins, value ?? "") ||
+            /^[\w.-]+\/[\w.-]+$/.test(value ?? "")
               ? undefined
               : `Use ${Object.keys(officialPlugins).join(", ")} or owner/repository`,
         }),
