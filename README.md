@@ -35,23 +35,23 @@ ingestron --version
 
 This source release prepares the npm package named `ingestron`; it does not claim
 that the same CLI version is already published on npm. Its core dependency is the
-public, exact version `@ingestron/core@0.12.1`.
+public, exact version `@ingestron/core@0.12.2`.
 
 Follow the [five-minute quickstart](docs/quickstart.md) for a project you can keep.
 
 ## Work with projects and plugins
 
-Commands use resource groups such as `source`, `contract`, `flow`, `config` and
-`plugin`. Installed plugins can add their own namespace:
+Commands use resource groups such as `source`, `contract`, `flow`, `config`,
+`provider` and `connector`. Installed packages can add their own namespace:
 
 ```text
-ingestron plugin install local
-ingestron plugin install github
+ingestron provider install local
+ingestron connector install github
 ingestron <namespace> <resource> <verb> --input request.json
 ```
 
 Installation caches an exact, qualified version without changing project configuration.
-Use `github@1.32.1` for an explicit pin, or `plugin update github` to check for a newer
+Use `github@1.33.0` for an explicit pin, or `connector update github` to check for a newer
 qualified release. Browse installed packages with `ingestron plugin browse`. Command help
 shows the selected plugin's input schema without executing it.
 

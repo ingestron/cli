@@ -35,6 +35,8 @@ one matching version is installed; specify its exact reference if ambiguous.
 
 | Group             | Commands                                                                              | Purpose                                                                             |
 | ----------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `provider`        | `install`, `update`, `list`, `exec`                                                   | Install execution providers and run configured offline commands                     |
+| `connector`       | `install`, `update`, `list`                                                           | Install source connectors; their settings belong in project connections             |
 | `plugin`          | `list`, `browse`, `info`, `versions`                                                  | Inspect installed packages or explicitly query repository tags                      |
 | `plugin`          | `install`, `update`, `configure`, `migrate`, `pack-add`                               | Lock exact references and review project registration/selection                     |
 | `plugin`          | `scaffold`, `check`, `show`                                                           | Create a synthetic starter, check provider determinism, inspect configured commands |
@@ -65,7 +67,7 @@ the current OS user and can access resources allowed by that identity.
 Earlier implemented root spellings remain hidden compatibility routes: `providers`,
 `packages`, `table`, `step`, `dataset`, `environments`, `validate`, `doctor`,
 `resolve`, `plan`, `diff`, `generate`, `validate-output`, `schema`, `activity`,
-`activities`, `standards`, `provider` and `mcp`. New scripts should use the groups
+`activities`, `standards` and `mcp`. New scripts should use the groups
 above. `contract draft --id` and the old flat-native `contract validate` also remain
 accepted. Unsupported commands such as `deploy` and `source discover` are not
 registered; they fail as unknown commands.

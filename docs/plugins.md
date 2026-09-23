@@ -1,17 +1,17 @@
-# Install and inspect plugins
+# Install providers and connectors
 
 Plugins supply platform generators, connector definitions, standards and other
 versioned capabilities. The CLI hosts their commands through core; it contains no
 bundled marketplace or platform implementation.
 
-## Install an official plugin
+## Install an execution provider or source connector
 
 ```sh
-ingestron plugin install local
-ingestron plugin install github
-ingestron plugin install files
-ingestron plugin install azure-blob
-ingestron plugin install sql-server@1.0.0
+ingestron provider install local
+ingestron connector install github
+ingestron connector install files
+ingestron connector install azure-blob
+ingestron connector install sql-server@1.0.0
 ```
 
 Official names resolve through the small [qualified release catalogue](https://github.com/ingestron/connectors/blob/main/catalogue.json).
@@ -21,15 +21,16 @@ Git commit and file digests in `packages.lock.yaml`. Commit that lock. Catalogue
 metadata is fetched only when resolving a new latest selection; it contains no code.
 If it is unavailable, retry or specify an exact version.
 
+Each command checks the package type before changing `packages.lock.yaml`.
 Installation caches the package under `.ingestron/packages/` in the selected project
 (or current directory). It does **not** edit `project.yaml`, create a connection or
 execute the plugin. `--cache-only` remains accepted but is no longer needed.
 
 ```sh
-ingestron plugin install github@1.32.1
-ingestron plugin install local@0.4.0
-ingestron plugin install github --frozen
-ingestron plugin update github
+ingestron connector install github@1.33.0
+ingestron provider install local@0.4.1
+ingestron connector install github --frozen
+ingestron connector update github
 ```
 
 Repeated installation, including `@latest`, reuses the highest exact stable version
@@ -41,11 +42,12 @@ Builds and runs keep using their configured exact references.
 
 ## Other packages and development
 
-Explicit references remain supported:
+Explicit references remain supported under the matching command:
 
 ```text
 ingestron plugin versions owner/repository
-ingestron plugin install owner/repository@1.2.3
+ingestron provider install owner/repository@1.2.3
+ingestron connector install owner/repository/connector.yaml@1.2.3
 ```
 
 `plugin/provider.yaml` is the default manifest. Other packages use an explicit
@@ -56,7 +58,8 @@ repositories is implied.
 
 `plugin versions github` lists source-specific Git tags, including releases not
 qualified in the catalogue. Listing is not compatibility proof. Interactive
-`plugin install` asks for an official name or a repository; repositories require
+`plugin install` remains available for older scripts and other package types.
+Interactive installation asks for an official name or a repository; repositories require
 selection of an exact tag. Automation can use names, but should pin exact versions
 and use `--frozen` for reproducible restoration.
 
@@ -68,6 +71,8 @@ is retained; prefer official names for qualified version selection.
 ## Configure and inspect
 
 ```sh
+ingestron provider list
+ingestron connector list
 ingestron plugin list
 ingestron plugin browse --no-input
 ingestron plugin info <installed-id-or-reference>
