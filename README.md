@@ -8,18 +8,16 @@ The CLI is a thin application over [`@ingestron/core`](https://github.com/ingest
 Providers supply platform-specific generators, connectors and standards. Installing
 the CLI does not install a platform provider or connect to a cloud account.
 
-This branch prepares an unpublished 0.16.1 candidate using core 0.12.5. It adds
+Version 0.16.1 uses core 0.12.5. It adds
 `connections add`, `connections flow-add`, `contract scaffold` and `contract map`
 for reviewable connector/workflow authoring, an editable first contract and
 source-to-target ODCS mapping. `connections flow-add --execution <file>` passes
-reviewed provider execution settings to core. Use matching local
-core and provider/connector candidates for this path; the public 0.15.1 package
-does not contain these commands. A clean frozen-lockfile install of this branch
-is pending the coordinated core 0.12.5 package release.
+reviewed provider execution settings to core. Use a qualified local provider and
+connector release for execution.
 
 ## Get started
 
-Use Node 22.12 or newer, Git and pnpm 10.15.0. For the published 0.15.1 line:
+Use Node 22.12 or newer, Git and pnpm 10.15.0:
 
 ```sh
 git clone https://github.com/ingestron/cli.git
@@ -38,13 +36,12 @@ To install this checkout's CLI in your terminal:
 
 ```sh
 pnpm pack --pack-destination build/release
-npm install --global ./build/release/ingestron-0.15.1.tgz
+npm install --global ./build/release/ingestron-0.16.1.tgz
 ingestron --version
 ```
 
-This source release prepares the npm package named `ingestron`; it does not claim
-that the same CLI version is already published on npm. Its core dependency is the
-public, exact version `@ingestron/core@0.12.4`.
+The package name is `ingestron`; its core dependency is the public, exact version
+`@ingestron/core@0.12.5`.
 
 Follow the [five-minute quickstart](docs/quickstart.md) for a project you can keep.
 

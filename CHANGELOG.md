@@ -1,11 +1,11 @@
 # Changelog
 
-## 0.16.1 (private candidate)
+## 0.16.1
 
 - Add `contract scaffold` for a minimal draft from a known field.
 - Let `connections flow-add --execution <file>` pass reviewed provider-specific
   execution settings to the core operation.
-- Keep core 0.12.5 as a private coordinated candidate; no public release is made.
+- Pin the public core 0.12.5 package for the shared operation contract.
 
 ## 0.16.0 (private candidate)
 
