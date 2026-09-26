@@ -138,6 +138,12 @@ export function workflowCommands(app: Command, host: Host) {
       "Also check eligibility for flat native table authoring",
     )
     .action((id, options) => run("contract_check", { id, ...options }));
+  contract
+    .command("map <file>")
+    .description(
+      "Preview or apply a versioned source-to-contract field mapping draft",
+    )
+    .action((file) => author("contract_map_fields", readData(file)));
   const flow = app.commands.find((c) => c.name() === "flow")!;
   flow
     .command("connect <id>")

@@ -8,9 +8,16 @@ The CLI is a thin application over [`@ingestron/core`](https://github.com/ingest
 Providers supply platform-specific generators, connectors and standards. Installing
 the CLI does not install a platform provider or connect to a cloud account.
 
+This branch prepares an unpublished 0.16.0 candidate using core 0.12.5. It adds
+`connections add`, `connections flow-add` and `contract map` for reviewable
+connector/workflow authoring and source-to-target ODCS mapping. Use matching local
+core and provider/connector candidates for this path; the public 0.15.1 package
+does not contain these commands. A clean frozen-lockfile install of this branch
+is pending the coordinated core 0.12.5 package release.
+
 ## Get started
 
-Use Node 22.12 or newer, Git and pnpm 10.15.0. Build the public source:
+Use Node 22.12 or newer, Git and pnpm 10.15.0. For the published 0.15.1 line:
 
 ```sh
 git clone https://github.com/ingestron/cli.git

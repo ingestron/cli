@@ -380,6 +380,56 @@ const connections = app
     "Validate and prepare project-defined connector flows without source access",
   );
 connections
+  .command("add <id>")
+  .description("Register an installed connector as a project connection")
+  .requiredOption("--package <alias>", "Configured connector package alias")
+  .requiredOption("--source-id <id>", "Non-secret source identity")
+  .requiredOption("--tenant-id <id>", "Non-secret tenant identity")
+  .option("--binding <id>", "Environment binding for runtime secrets")
+  .option("--settings <file>", "Project-relative YAML/JSON settings file")
+  .action((id, options) =>
+    author("connection_add", {
+      id,
+      package: options.package,
+      sourceId: options.sourceId,
+      tenantId: options.tenantId,
+      ...(options.binding ? { binding: options.binding } : {}),
+      settings: options.settings ? readData(options.settings) : {},
+    }),
+  );
+connections
+  .command("flow-add <id>")
+  .description("Create a connection-backed local ingestion flow")
+  .requiredOption("--provider <configuration>", "Configured provider")
+  .requiredOption("--connection <id>", "Configured connection")
+  .requiredOption("--table <id>", "Output table")
+  .requiredOption("--contract <file>", "Project-relative ODCS contract")
+  .option("--source <file>", "Project-relative YAML/JSON table source settings")
+  .option("--source-path <path>", "Files connector source path")
+  .option("--format <format>", "Files connector format")
+  .action((id, options) => {
+    check(
+      !!options.source !== !!options.sourcePath,
+      "OPTION",
+      "Choose a source settings file or a source path",
+    );
+    check(
+      !options.sourcePath || options.format,
+      "OPTION",
+      "A file source needs its format",
+    );
+    author("connection_flow_add", {
+      id,
+      provider: options.provider,
+      connection: options.connection,
+      table: options.table,
+      contract: options.contract,
+      source: options.source
+        ? readData(options.source)
+        : { path: options.sourcePath, format: options.format },
+    });
+  });
+connections
   .command("validate <flow>")
   .action((flow) => run("connection_prepare", { flow, validateOnly: true }));
 connections
@@ -658,6 +708,8 @@ app.hook("preAction", (_root, command) => {
       "source prepare",
       "source import",
       "plugin configure",
+      "connections add",
+      "connections flow-add",
       "plugin migrate",
       "config environment add",
       "flow table add",
@@ -677,6 +729,7 @@ app.hook("preAction", (_root, command) => {
       "providers migrate",
       "providers export",
       "contract draft",
+      "contract map",
       "plugin scaffold",
       "plugin pack-add",
     ]).has(parts.join(" ")),
