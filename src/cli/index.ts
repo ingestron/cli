@@ -399,7 +399,7 @@ connections
   );
 connections
   .command("flow-add <id>")
-  .description("Create a connection-backed local ingestion flow")
+  .description("Create a connection-backed ingestion flow")
   .requiredOption("--provider <configuration>", "Configured provider")
   .requiredOption("--connection <id>", "Configured connection")
   .requiredOption("--table <id>", "Output table")
@@ -407,6 +407,7 @@ connections
   .option("--source <file>", "Project-relative YAML/JSON table source settings")
   .option("--source-path <path>", "Files connector source path")
   .option("--format <format>", "Files connector format")
+  .option("--execution <file>", "Project-relative provider execution settings")
   .action((id, options) => {
     check(
       !!options.source !== !!options.sourcePath,
@@ -427,6 +428,7 @@ connections
       source: options.source
         ? readData(options.source)
         : { path: options.sourcePath, format: options.format },
+      ...(options.execution ? { execution: readData(options.execution) } : {}),
     });
   });
 connections
