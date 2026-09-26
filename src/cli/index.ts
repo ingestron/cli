@@ -731,6 +731,7 @@ app.hook("preAction", (_root, command) => {
       "providers migrate",
       "providers export",
       "contract draft",
+      "contract scaffold",
       "contract map",
       "plugin scaffold",
       "plugin pack-add",
