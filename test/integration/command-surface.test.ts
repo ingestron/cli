@@ -252,3 +252,29 @@ test("plugin scaffolding honours dry-run and installed browsing makes no marketp
     /private previews|upstream catalogue|official plugins/i,
   );
 });
+
+test("contract scaffold previews without writing and then creates a draft", (t) => {
+  const f = fixture(t);
+  const contract = resolve(f.root, "contracts", "new_customers.odcs.yaml");
+  const args = [
+    "contract",
+    "scaffold",
+    "new_customers",
+    "--table",
+    "new_customers",
+    "--field",
+    "customer_id",
+    "--type",
+    "string",
+  ];
+  const preview = run(f.root, "--json", "--dry-run", ...args);
+  assert.equal(preview.status, 0, preview.stdout + preview.stderr);
+  assert.equal(
+    JSON.parse(preview.stdout).result.apiVersion,
+    "ingestron.change/v1",
+  );
+  assert.equal(existsSync(contract), false);
+  const created = run(f.root, "--json", ...args);
+  assert.equal(created.status, 0, created.stdout + created.stderr);
+  assert.equal(existsSync(contract), true);
+});

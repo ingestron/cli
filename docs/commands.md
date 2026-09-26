@@ -6,21 +6,21 @@ the project contains their configured, locked packages.
 
 ## Project commands
 
-| Group                | Commands                                                     | Purpose                                                                                         |
-| -------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| `init [directory]`   | `--id`, `--provider`, `--environments`                       | Create project/environment files; optional provider must already be installed                   |
-| `source`             | `add`, `list`, `show`, `configure`, `prepare`, `import`      | Define sources, export supported readers, import supplied metadata                              |
-| `contract`           | `draft`, `list`, `show`, `check`                             | Draft ODCS from `--source` or `--metadata`; `check --native` also checks flat-table eligibility |
-| `flow`               | `add`, `list`, `show`, `configure`, `connect`, `export`      | Author provider flows and explicit dataset handovers/export groups                              |
-| `flow table`         | `add`, `configure`, `list`                                   | Manage ingestion tables within flows                                                            |
-| `flow step`          | `add`                                                        | Add a transformation activity and its input settings                                            |
-| `flow output`        | `add`, `list`                                                | Declare or inspect published datasets                                                           |
-| `flow standard`      | `list`, `show`                                               | Inspect standards declared by installed providers                                               |
-| `config`             | `show`, `set`, `explain`, `fill`                             | Inspect/edit non-secret values; `fill` requires an interactive terminal                         |
-| `config environment` | `list`, `add --from`                                         | Inspect profiles or copy one for review                                                         |
-| `check`              | `--draft`, `--setup`, `--output`, or strict default          | Check incomplete configuration, local setup, generated output or build readiness                |
-| `build`              | `--provider`, `--flow`, `--delivery`, `--out`, `--ownership` | Generate local assets through the installed provider                                            |
-| `connections`        | `validate`, `prepare`, `contracts`                           | Validate/prepare project-defined connector flows; no source connection                          |
+| Group                | Commands                                                     | Purpose                                                                                                    |
+| -------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| `init [directory]`   | `--id`, `--provider`, `--environments`                       | Create project/environment files; optional provider must already be installed                              |
+| `source`             | `add`, `list`, `show`, `configure`, `prepare`, `import`      | Define sources, export supported readers, import supplied metadata                                         |
+| `contract`           | `scaffold`, `draft`, `list`, `show`, `check`                 | Create a starter from a known field or draft from supplied metadata; check ODCS and flat-table eligibility |
+| `flow`               | `add`, `list`, `show`, `configure`, `connect`, `export`      | Author provider flows and explicit dataset handovers/export groups                                         |
+| `flow table`         | `add`, `configure`, `list`                                   | Manage ingestion tables within flows                                                                       |
+| `flow step`          | `add`                                                        | Add a transformation activity and its input settings                                                       |
+| `flow output`        | `add`, `list`                                                | Declare or inspect published datasets                                                                      |
+| `flow standard`      | `list`, `show`                                               | Inspect standards declared by installed providers                                                          |
+| `config`             | `show`, `set`, `explain`, `fill`                             | Inspect/edit non-secret values; `fill` requires an interactive terminal                                    |
+| `config environment` | `list`, `add --from`                                         | Inspect profiles or copy one for review                                                                    |
+| `check`              | `--draft`, `--setup`, `--output`, or strict default          | Check incomplete configuration, local setup, generated output or build readiness                           |
+| `build`              | `--provider`, `--flow`, `--delivery`, `--out`, `--ownership` | Generate local assets through the installed provider                                                       |
+| `connections`        | `add`, `flow-add`, `validate`, `prepare`, `contracts`        | Author and validate project-defined connector flows; `flow-add --execution` accepts provider settings      |
 
 Source execution contexts are `manual` or `local`; `source prepare` exports a reader,
 it does not run one. Contracts remain drafts for human review. A build creates no

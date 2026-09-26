@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.16.1
+
+- Add `contract scaffold` for a minimal draft from a known field.
+- Let `connections flow-add --execution <file>` pass reviewed provider-specific
+  execution settings to the core operation.
+- Pin the public core 0.12.5 package for the shared operation contract.
+
+## 0.16.0 (private candidate)
+
+- Add reviewable `connections add` and `connections flow-add` commands for
+  connector-backed project authoring.
+- Add `contract map` for versioned source-field selection and target names using
+  saved discovery evidence. Review, approval and execution remain separate.
+- Consume the matching unpublished core 0.12.5 operation contract.
+
 ## 0.15.1
 
 - Pin core 0.12.4 so CLI and MCP accept reusable connections with per-table source selectors; new projects start with short top-level package names.

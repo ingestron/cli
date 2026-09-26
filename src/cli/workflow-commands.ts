@@ -123,6 +123,16 @@ export function workflowCommands(app: Command, host: Host) {
       author("contract_create", { ...options, id: id ?? options.id });
     });
   contract
+    .command("scaffold <id>")
+    .description("Create an editable draft contract from one known field")
+    .requiredOption("--table <name>", "Dataset/table name")
+    .requiredOption("--field <name>", "First known source field")
+    .requiredOption(
+      "--type <type>",
+      "Field type: string, integer, number or boolean",
+    )
+    .action((id, options) => author("contract_scaffold", { id, ...options }));
+  contract
     .command("list")
     .description("List authored contracts")
     .action(() => run("contract_list"));
@@ -138,6 +148,12 @@ export function workflowCommands(app: Command, host: Host) {
       "Also check eligibility for flat native table authoring",
     )
     .action((id, options) => run("contract_check", { id, ...options }));
+  contract
+    .command("map <file>")
+    .description(
+      "Preview or apply a versioned source-to-contract field mapping draft",
+    )
+    .action((file) => author("contract_map_fields", readData(file)));
   const flow = app.commands.find((c) => c.name() === "flow")!;
   flow
     .command("connect <id>")
