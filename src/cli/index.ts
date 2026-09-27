@@ -18,6 +18,7 @@ import { check, Problem } from "@ingestron/core/adapter";
 import { version } from "../version.js";
 import { terminal, exitCode } from "./output.js";
 import { decorate, banner, backgroundOperation } from "./presentation.js";
+import { executePluginOperation } from "./plugin-resolution.js";
 import { workflowCommands } from "./workflow-commands.js";
 const app = new Command()
   .name("ingestron")
@@ -136,7 +137,7 @@ app
     } catch {
       throw new Problem("INPUT", "Expected a JSON operation request on stdin");
     }
-    const result = await executeAsync(
+    const result = await executePluginOperation(
       {
         ...context(),
         allowWrite: !!flags.allowWrite && !opts().dryRun,

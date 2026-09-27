@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.16.3
+
+- Resolve qualified plugin aliases through the same adapter in JSON-stdin, terminal
+  and MCP installation routes. Preserve permission checks and exact package locks.
+
 ## 0.16.2
 
 - Pin core 0.12.6 so mixed local and native-target projects validate correctly.
