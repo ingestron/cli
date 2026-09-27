@@ -321,3 +321,71 @@ test("operation stdin boundary preserves proposals and requires write permission
     false,
   );
 });
+
+test("execution selection is explicit on compiler and runtime commands", (t) => {
+  const f = fixture(t);
+  for (const args of [
+    ["check"],
+    ["build"],
+    ["validate"],
+    ["plan"],
+    ["resolve"],
+    ["run"],
+    ["runtime", "prepare"],
+  ]) {
+    const help = run(f.root, ...args, "--help");
+    assert.equal(help.status, 0);
+    assert.match(help.stdout, /--profile <name>/);
+  }
+});
+
+test("installed core selects a named execution profile without changing logical tables", (t) => {
+  const f = fixture(t);
+  f.flow.executionProfiles = {
+    alternate: {
+      provider: "engineering",
+      ingestion: f.flow.ingestion,
+      source: f.flow.defaults.source,
+    },
+  };
+  f.put("flows/source/flow.yaml", f.flow);
+  const selected = run(
+    f.root,
+    "--json",
+    "resolve",
+    "--flow",
+    "source",
+    "--profile",
+    "alternate",
+  );
+  assert.equal(selected.status, 0, selected.stdout);
+  assert.deepEqual(
+    Object.keys(JSON.parse(selected.stdout).result.flows[0].tables),
+    ["customers", "orders"],
+  );
+  const planned = run(
+    f.root,
+    "--json",
+    "plan",
+    "--flow",
+    "source",
+    "--profile",
+    "alternate",
+  );
+  assert.equal(planned.status, 0, planned.stdout);
+  assert.equal(
+    JSON.parse(planned.stdout).result.selection.profile,
+    "alternate",
+  );
+  const invalid = run(
+    f.root,
+    "--json",
+    "check",
+    "--flow",
+    "source",
+    "--profile",
+    "missing",
+  );
+  assert.notEqual(invalid.status, 0);
+  assert.match(invalid.stdout, /PROFILE/);
+});

@@ -210,6 +210,7 @@ export function workflowCommands(app: Command, host: Host) {
       "Check generated output ownership and syntax",
     )
     .option("--flow <id>", "Check one flow")
+    .option("--profile <name>", "Execution profile within the selected flow")
     .option("--table <id>", "Check one table within a selected flow")
     .option("--step <id>", "Check one step within a selected flow")
     .action((options) => {
@@ -221,7 +222,7 @@ export function workflowCommands(app: Command, host: Host) {
       );
       check(
         !(options.setup || options.output) ||
-          !(options.flow || options.table || options.step),
+          !(options.flow || options.table || options.step || options.profile),
         "OPTION",
         "Flow/table/step selection applies only to project checks",
       );
@@ -231,6 +232,7 @@ export function workflowCommands(app: Command, host: Host) {
         run("validate", {
           mode: options.draft ? "draft" : "strict",
           ...(options.flow ? { flow: options.flow } : {}),
+          ...(options.profile ? { profile: options.profile } : {}),
           ...(options.table ? { table: options.table } : {}),
           ...(options.step ? { step: options.step } : {}),
         });
@@ -249,6 +251,7 @@ export function workflowCommands(app: Command, host: Host) {
       "Build a configured target and required dependencies",
     )
     .option("--flow <id>", "Build one flow")
+    .option("--profile <name>", "Execution profile within the selected flow")
     .option(
       "--out <directory>",
       "Generated output directory",
@@ -266,7 +269,8 @@ export function workflowCommands(app: Command, host: Host) {
         "--provider <configuration>",
         "Execute flows in one configured target",
       )
-      .option("--flow <id>", "Execute one flow from the build");
+      .option("--flow <id>", "Execute one flow from the build")
+      .option("--profile <name>", "Execution profile recorded in the build");
   executionOptions(
     app
       .command("runtime")

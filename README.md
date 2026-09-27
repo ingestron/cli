@@ -77,3 +77,17 @@ not inside the compiler's JavaScript sandbox. See [security](SECURITY.md).
 Original code is licensed by **Otrera Limited** under [Apache-2.0](LICENSE).
 [NOTICE](NOTICE) and [third-party notices](THIRD_PARTY_NOTICES.md) retain attribution
 and dependency terms.
+
+### Select an execution profile
+
+An ingestion flow can declare named `executionProfiles`. Select the environment
+and profile independently; datasets and contracts stay in the same logical flow.
+
+```sh
+ingestron --environment dev check --flow northwind --profile adf
+ingestron --environment dev build --flow northwind --profile adf --out build/adf
+```
+
+Omit `--profile` to use the flow's default provider. Local runtime preparation and
+execution must select the same profile recorded by the build. A native-provider
+build generates assets; it does not deploy or run them on the target platform.

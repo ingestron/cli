@@ -633,12 +633,14 @@ app
   .command("validate")
   .option("--mode <mode>", "draft or strict", "strict")
   .option("--flow <id>")
+  .option("--profile <name>", "Execution profile within the selected flow")
   .option("--table <id>")
   .option("--step <id>")
   .action((command) =>
     run("validate", {
       mode: command.mode,
       ...(command.flow ? { flow: command.flow } : {}),
+      ...(command.profile ? { profile: command.profile } : {}),
       ...(command.table ? { table: command.table } : {}),
       ...(command.step ? { step: command.step } : {}),
     }),
@@ -649,16 +651,22 @@ app
     "Check local configuration and missing inputs; no platform connection",
   )
   .action(() => run("doctor"));
-app.command("resolve").action(() => run("resolve"));
+app
+  .command("resolve")
+  .option("--flow <id>")
+  .option("--profile <name>")
+  .action((command) => run("resolve", command));
 app
   .command("plan")
   .option("--flow <id>")
+  .option("--profile <name>", "Execution profile within the selected flow")
   .option("--table <id>")
   .option("--step <id>")
   .option("--out <file>", "Save a digest-bound JSON plan")
   .action((command) => {
     const result = execute(context(), "plan", {
       ...(command.flow ? { flow: command.flow } : {}),
+      ...(command.profile ? { profile: command.profile } : {}),
       ...(command.table ? { table: command.table } : {}),
       ...(command.step ? { step: command.step } : {}),
     });
