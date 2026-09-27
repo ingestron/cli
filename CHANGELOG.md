@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.16.2
+
+- Pin core 0.12.6 so mixed local and native-target projects validate correctly.
+- Add a JSON-stdin operation boundary for Studio hosts, with explicit write,
+  download and execution permissions and a bounded request size.
+
 ## 0.16.1
 
 - Add `contract scaffold` for a minimal draft from a known field.

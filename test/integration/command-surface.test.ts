@@ -278,3 +278,46 @@ test("contract scaffold previews without writing and then creates a draft", (t) 
   assert.equal(created.status, 0, created.stdout + created.stderr);
   assert.equal(existsSync(contract), true);
 });
+
+test("operation stdin boundary preserves proposals and requires write permission", (t) => {
+  const f = fixture(t);
+  const invoke = (name: string, request: unknown, ...permissions: string[]) => {
+    const child = spawnSync(
+      process.execPath,
+      [
+        cli,
+        "--project",
+        f.root,
+        "--json",
+        "--no-input",
+        "operation",
+        name,
+        ...permissions,
+      ],
+      { input: JSON.stringify(request), encoding: "utf8", timeout: 15000 },
+    );
+    return JSON.parse(child.stdout);
+  };
+  const proposed = invoke("edit", {
+    files: { "notes.md": "Reviewed change\n" },
+  });
+  assert.equal(proposed.ok, true);
+  const denied = invoke("apply", { proposal: proposed.result });
+  assert.equal(denied.ok, false);
+  assert.equal(existsSync(resolve(f.root, "notes.md")), false);
+  const applied = invoke(
+    "apply",
+    { proposal: proposed.result },
+    "--allow-write",
+  );
+  assert.equal(applied.ok, true);
+  assert.equal(
+    readFileSync(resolve(f.root, "notes.md"), "utf8"),
+    "Reviewed change\n",
+  );
+  assert.equal(invoke("not_an_operation", {}).ok, false);
+  assert.equal(
+    invoke("packages_install", { reference: "example/missing@1.0.0" }).ok,
+    false,
+  );
+});

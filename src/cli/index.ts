@@ -7,6 +7,7 @@ import { parseDocument } from "yaml";
 import {
   execute,
   executeAsync,
+  operationSchemas,
   type OperationName,
   type Result,
   type Context,
@@ -108,6 +109,46 @@ const run = async (
     : await executeAsync(ctx, name, args);
   print(result, args);
 };
+// Structured host boundary: request bytes are data, never shell arguments.
+app
+  .command("operation <name>")
+  .description("Invoke a versioned core operation with a JSON request on stdin")
+  .option("--allow-write", "Permit this operation to write project files")
+  .option("--allow-network", "Permit this operation to download packages")
+  .option("--allow-execute", "Permit this operation to execute a local runtime")
+  .action(async (name: string, flags) => {
+    check(
+      Object.hasOwn(operationSchemas, name),
+      "OPERATION",
+      "Unknown operation",
+    );
+    let bytes = 0;
+    const chunks: Buffer[] = [];
+    for await (const chunk of process.stdin) {
+      const value = Buffer.from(chunk);
+      bytes += value.length;
+      check(bytes <= 1024 * 1024, "LIMIT", "Operation request exceeds 1 MiB");
+      chunks.push(value);
+    }
+    let request: unknown;
+    try {
+      request = JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}");
+    } catch {
+      throw new Problem("INPUT", "Expected a JSON operation request on stdin");
+    }
+    const result = await executeAsync(
+      {
+        ...context(),
+        allowWrite: !!flags.allowWrite && !opts().dryRun,
+        allowNetwork: !!flags.allowNetwork && !opts().dryRun,
+        allowExecute: !!flags.allowExecute && !opts().dryRun,
+      },
+      name as OperationName,
+      request,
+    );
+    print(result, request);
+  });
+
 function author(name: OperationName, args: unknown, ctx = context()) {
   const result = execute(ctx, name, args);
   return print(
