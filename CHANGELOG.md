@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.17.0
+
+- Bind one ingestion flow to named execution profiles with `--flow` and `--profile`.
+  Environments, datasets and contracts remain shared.
+- Pin core 0.12.7; builds and execution reject mismatched profile evidence.
+
 ## 0.16.3
 
 - Resolve qualified plugin aliases through the same adapter in JSON-stdin, terminal
