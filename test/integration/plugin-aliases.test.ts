@@ -362,3 +362,53 @@ test("SQL Server short references resolve only the qualified source package", as
     ),
   );
 });
+
+test("JSON operation install resolves aliases with terminal and MCP parity", (t) => {
+  const f = fixture(t);
+  const invoke = (request: unknown, flags: string[] = []) => {
+    const result = spawnSync(
+      process.execPath,
+      [
+        cli,
+        "--project",
+        f.root,
+        "--json",
+        "--no-input",
+        "operation",
+        "packages_install",
+        ...flags,
+      ],
+      {
+        input: JSON.stringify(request),
+        encoding: "utf8",
+        timeout: 20000,
+      },
+    );
+    return JSON.parse(result.stdout);
+  };
+  const request = {
+    reference: "local@1.0.0",
+    fromGit: resolve(f.root, "fixture-origin"),
+  };
+  assert.equal(invoke(request).diagnostics[0].code, "PERMISSION");
+  const installed = invoke(request, ["--allow-write", "--allow-network"]);
+  assert.equal(installed.ok, true, JSON.stringify(installed));
+  assert.equal(
+    installed.result.reference,
+    "ingestron/provider-local/plugin/provider.yaml@1.0.0",
+  );
+  const cached = invoke({ reference: "local", frozen: true }, [
+    "--allow-write",
+    "--allow-network",
+  ]);
+  assert.equal(cached.ok, true, JSON.stringify(cached));
+  assert.equal(cached.result.cached, true);
+  assert.equal(cached.result.reference, installed.result.reference);
+  assert.equal(
+    invoke({ reference: "local", kind: "connector" }, [
+      "--allow-write",
+      "--allow-network",
+    ]).diagnostics[0].code,
+    "PACKAGE",
+  );
+});
