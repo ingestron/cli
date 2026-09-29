@@ -55,6 +55,23 @@ function dataProductLines(products: unknown, quality?: any): string {
         : "")
   );
 }
+// Quality results recorded by connector runtimes before commit; counts only.
+function runQualityLine(flows: unknown): string {
+  if (!Array.isArray(flows)) return "";
+  const rules = flows.flatMap((f: any) =>
+    Array.isArray(f?.quality) ? f.quality : [],
+  );
+  if (!rules.length) return "";
+  const warned = rules.filter((r: any) => r.passed === false);
+  return `\nQuality rules: ${rules.length} checked before commit${
+    warned.length
+      ? `; ${warned.length} warning(s): ${warned
+          .slice(0, 5)
+          .map((r: any) => clean(r.id))
+          .join(", ")}${warned.length > 5 ? ", …" : ""}`
+      : ", all passed"
+  }.`;
+}
 function pluginLabel(reference: string): string {
   for (const [name, entry] of Object.entries(officialPlugins)) {
     const prefixes = [
@@ -214,7 +231,7 @@ export function terminal(
       );
     case "run":
     case "run_status":
-      return `Run ${clean(value.id)}: ${clean(value.status)} (${clean(value.action)}).\nTarget: ${clean(value.configuration)}; flows: ${value.flows.map(clean).join(", ")}.\nUse ingestron run status ${clean(value.id)} to inspect the receipt.`;
+      return `Run ${clean(value.id)}: ${clean(value.status)} (${clean(value.action)}).\nTarget: ${clean(value.configuration)}; flows: ${value.flows.map(clean).join(", ")}.${runQualityLine(value.result?.flows)}\nUse ingestron run status ${clean(value.id)} to inspect the receipt.`;
     case "build":
       return `Built ${value.packages?.length ?? 1} project package(s) into ${clean(value.directory)}.\n${clean(value.evidence)}`;
     case "generate":
