@@ -10,11 +10,23 @@ import { check, packageLock, Problem } from "@ingestron/core/adapter";
 import { coreVersion } from "../version.js";
 
 export const officialPlugins = {
+  adf: {
+    kind: "provider",
+    repository: "ingestron/provider-adf",
+    path: "plugin/provider.yaml",
+    tagPrefix: "",
+  },
   "azure-blob": {
     kind: "connector",
     repository: "ingestron/connectors",
     path: "connectors/azure-blob/connector.yaml",
     tagPrefix: "azure-blob-",
+  },
+  databricks: {
+    kind: "provider",
+    repository: "ingestron/provider-databricks",
+    path: "plugin/provider.yaml",
+    tagPrefix: "",
   },
   files: {
     kind: "connector",
