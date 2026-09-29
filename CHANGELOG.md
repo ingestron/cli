@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.17.2
+
+- Pin core 0.12.8. `ingestron check` lists data products with status and owner
+  from ODCS contracts, and notes quality rules recorded but not yet enforced.
+  An active contract must name an owner.
+
 ## 0.17.1
 
 - Add `adf` and `databricks` official provider names, resolving to the public
