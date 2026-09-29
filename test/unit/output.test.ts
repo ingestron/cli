@@ -68,3 +68,31 @@ test("configuration summary names resources without values", () => {
   assert.match(text, /source list/);
   assert.doesNotMatch(text, /secret-value/);
 });
+test("check lists data product owners and unenforced quality rules", () => {
+  const value = {
+    mode: "strict",
+    evidence: "offline",
+    dataProducts: [
+      {
+        contract: "orders",
+        status: "active",
+        owners: ["ana@example.com"],
+        qualityRules: 2,
+        enforcedQualityRules: 0,
+      },
+      { contract: "customers", status: "draft", owners: [], qualityRules: 0 },
+    ],
+  };
+  const text = terminal(result("validate", value));
+  assert.match(text, /Project checks passed/);
+  assert.match(text, /orders {2}active {2}owner ana@example\.com/);
+  assert.match(text, /customers {2}draft {2}no owner/);
+  assert.match(
+    text,
+    /2 quality rule\(s\) are recorded in contracts but not yet enforced/,
+  );
+  assert.doesNotMatch(
+    terminal(result("validate", { mode: "strict", evidence: "offline" })),
+    /Data products/,
+  );
+});

@@ -29,6 +29,29 @@ export function exitCode(result: Result): number {
 }
 const clean = (value: unknown): string =>
   String(value).replace(/[\u0000-\u001f\u007f-\u009f]/g, " ");
+// Data product ownership from ODCS contracts; absent with older core versions.
+function dataProductLines(products: unknown): string {
+  if (!Array.isArray(products) || !products.length) return "";
+  const shown = products.slice(0, 20).map((p: any) => {
+    const owners = Array.isArray(p.owners) ? p.owners.map(clean) : [];
+    return `\n  ${clean(p.contract)}  ${clean(p.status ?? "no status")}  ${
+      owners.length ? `owner ${owners.join(", ")}` : "no owner"
+    }`;
+  });
+  const recorded = products.reduce(
+    (n: number, p: any) =>
+      n + Math.max(0, (p.qualityRules ?? 0) - (p.enforcedQualityRules ?? 0)),
+    0,
+  );
+  return (
+    "\nData products:" +
+    shown.join("") +
+    (products.length > 20 ? `\n  … ${products.length - 20} more` : "") +
+    (recorded
+      ? `\n${recorded} quality rule(s) are recorded in contracts but not yet enforced.`
+      : "")
+  );
+}
 function pluginLabel(reference: string): string {
   for (const [name, entry] of Object.entries(officialPlugins)) {
     const prefixes = [
@@ -171,7 +194,8 @@ export function terminal(
     case "validate":
       return value.mode === "draft"
         ? `Draft configuration checked (${value.flows} flows).\n${value.pending.length} unresolved inputs. Strict build readiness has not been checked.`
-        : `Project checks passed${value.nodes === undefined ? "" : ` (${value.nodes} planned nodes)`}.\nValidation is local; no platform connection was tested.`;
+        : `Project checks passed${value.nodes === undefined ? "" : ` (${value.nodes} planned nodes)`}.\nValidation is local; no platform connection was tested.` +
+            dataProductLines(value.dataProducts);
     case "doctor":
       return `Project ${clean(value.project)} (${clean(value.environment)})\n${value.pending.length} unresolved inputs.\n${clean(value.platformAccess)}\nNext: ${clean(value.next)}`;
     case "runtime_prepare":
