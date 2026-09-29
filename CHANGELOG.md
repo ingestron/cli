@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.17.4
+
+- Pin core 0.12.10. Connectors that check contract quality rules before commit
+  count those rules as enforced at load for connection flows. `run` and
+  `run status` report how many rules were checked and name any warnings; a failed
+  error-severity rule stops the run with nothing committed.
+
 ## 0.17.3
 
 - Pin core 0.12.9. Contracts can carry ODCS quality rules; `check` and `build`
