@@ -75,7 +75,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### @ingestron/core@0.12.8
+### @ingestron/core@0.12.9
 
 Declared licence: Apache-2.0
 
