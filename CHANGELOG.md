@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.17.5
+
+- Pin core 0.12.11. Providers can declare which contract quality rules they
+  enforce for each ingestion standard; `check` and `build` report coverage for
+  the standard a flow selects. Databricks 3.4.0 and ADF 4.4.0 use this.
+
 ## 0.17.4
 
 - Pin core 0.12.10. Connectors that check contract quality rules before commit
