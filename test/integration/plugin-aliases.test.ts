@@ -327,6 +327,45 @@ test("Azure Blob short references preserve source identity and qualified latest 
     );
 });
 
+test("ADF and Databricks short references resolve the public provider repositories", async (t) => {
+  const f = fixture(t);
+  const context = { root: f.root, allowWrite: true, allowNetwork: true };
+  for (const [name, repository] of [
+    ["adf", "ingestron/provider-adf"],
+    ["databricks", "ingestron/provider-databricks"],
+  ] as const) {
+    assert.equal(officialPlugins[name].kind, "provider");
+    const value = {
+      apiVersion: "ingestron.catalogue/v1",
+      plugins: {
+        [name]: {
+          ...officialPlugins[name],
+          releases: [{ version: "1.0.0", coreVersions: [coreVersion] }],
+        },
+      },
+    };
+    for (const reference of [name, `${name}@latest`, `${name}@1.0.0`]) {
+      const args = await resolvePluginArgs(
+        context,
+        "packages_install",
+        { reference },
+        async () => value,
+      );
+      assert.equal(args.reference, `${repository}/plugin/provider.yaml@1.0.0`);
+      assert.equal(args.tagPrefix, "");
+    }
+    await assert.rejects(
+      resolvePluginArgs(
+        context,
+        "packages_install",
+        { reference: name, kind: "connector" },
+        async () => value,
+      ),
+      /is a provider/,
+    );
+  }
+});
+
 test("SQL Server short references resolve only the qualified source package", async (t) => {
   const f = fixture(t);
   const context = { root: f.root, allowWrite: true, allowNetwork: true };

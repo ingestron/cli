@@ -8,13 +8,17 @@ bundled marketplace or platform implementation.
 
 ```sh
 ingestron provider install local
+ingestron provider install adf
+ingestron provider install databricks
 ingestron connector install github
 ingestron connector install files
 ingestron connector install azure-blob
 ingestron connector install sql-server@1.0.0
 ```
 
-Official names resolve through the small [qualified release catalogue](https://github.com/ingestron/connectors/blob/main/catalogue.json).
+`local` runs flows on your machine. `adf` and `databricks` generate native Azure
+Data Factory and Databricks assets from the same project; they generate files only
+and never deploy. Official names resolve through the small [qualified release catalogue](https://github.com/ingestron/connectors/blob/main/catalogue.json).
 On first installation, an omitted version or `@latest` selects the newest catalogue
 release qualified with this CLI's pinned core. The result records an exact version,
 Git commit and file digests in `packages.lock.yaml`. Commit that lock. Catalogue
