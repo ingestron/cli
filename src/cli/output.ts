@@ -30,8 +30,9 @@ export function exitCode(result: Result): number {
 const clean = (value: unknown): string =>
   String(value).replace(/[\u0000-\u001f\u007f-\u009f]/g, " ");
 // Data product ownership from ODCS contracts; absent with older core versions.
-function dataProductLines(products: unknown): string {
+function dataProductLines(products: unknown, quality?: any): string {
   if (!Array.isArray(products) || !products.length) return "";
+  const summary = quality?.summary;
   const shown = products.slice(0, 20).map((p: any) => {
     const owners = Array.isArray(p.owners) ? p.owners.map(clean) : [];
     return `\n  ${clean(p.contract)}  ${clean(p.status ?? "no status")}  ${
@@ -47,9 +48,11 @@ function dataProductLines(products: unknown): string {
     "\nData products:" +
     shown.join("") +
     (products.length > 20 ? `\n  … ${products.length - 20} more` : "") +
-    (recorded
-      ? `\n${recorded} quality rule(s) are recorded in contracts but not yet enforced.`
-      : "")
+    (summary && summary.rules
+      ? `\nQuality rules: ${summary.rules} (${summary.atLoad} at load, ${summary.afterLoad} after load, ${summary.unsupported} not enforced by the target${summary.documentation ? `, ${summary.documentation} documentation only` : ""}).`
+      : !summary && recorded
+        ? `\n${recorded} quality rule(s) are recorded in contracts but not yet enforced.`
+        : "")
   );
 }
 function pluginLabel(reference: string): string {
@@ -195,7 +198,7 @@ export function terminal(
       return value.mode === "draft"
         ? `Draft configuration checked (${value.flows} flows).\n${value.pending.length} unresolved inputs. Strict build readiness has not been checked.`
         : `Project checks passed${value.nodes === undefined ? "" : ` (${value.nodes} planned nodes)`}.\nValidation is local; no platform connection was tested.` +
-            dataProductLines(value.dataProducts);
+            dataProductLines(value.dataProducts, value.quality);
     case "doctor":
       return `Project ${clean(value.project)} (${clean(value.environment)})\n${value.pending.length} unresolved inputs.\n${clean(value.platformAccess)}\nNext: ${clean(value.next)}`;
     case "runtime_prepare":
