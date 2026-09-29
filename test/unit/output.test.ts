@@ -128,3 +128,31 @@ test("check summarises quality rule coverage by enforcement mode", () => {
   );
   assert.doesNotMatch(text, /recorded in contracts but not yet enforced/);
 });
+test("run summaries report pre-commit quality results by rule and count", () => {
+  const value = {
+    id: "r1",
+    status: "succeeded",
+    action: "run",
+    configuration: "local",
+    flows: ["retail"],
+    result: {
+      flows: [
+        {
+          flow: "retail",
+          quality: [
+            { id: "orders.key-unique", passed: true, value: 0 },
+            { id: "amount-present", passed: false, value: 3 },
+          ],
+        },
+      ],
+    },
+  };
+  assert.match(
+    terminal(result("run", value)),
+    /Quality rules: 2 checked before commit; 1 warning\(s\): amount-present\./,
+  );
+  value.result.flows[0].quality[1].passed = true;
+  assert.match(terminal(result("run_status", value)), /all passed/);
+  delete (value.result.flows[0] as any).quality;
+  assert.doesNotMatch(terminal(result("run", value)), /Quality/);
+});
