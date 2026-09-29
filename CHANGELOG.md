@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.17.3
+
+- Pin core 0.12.9. Contracts can carry ODCS quality rules; `check` and `build`
+  report how each target enforces them, and an error-severity rule the target
+  cannot enforce blocks the build unless `defaults.quality.unsupported: report`.
+  Primary keys imply not-null and unique rules, reported without blocking.
+
 ## 0.17.2
 
 - Pin core 0.12.8. `ingestron check` lists data products with status and owner
