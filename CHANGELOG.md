@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.17.6
+
+- Pin core 0.12.12. Providers can declare where each engine's rules are enforced,
+  and SQL rules may use `${table}` and, on column rules, `${column}`; other
+  placeholders fail `check`. Databricks 3.5.0 and ADF 4.5.0 use this.
+
 ## 0.17.5
 
 - Pin core 0.12.11. Providers can declare which contract quality rules they
