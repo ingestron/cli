@@ -96,3 +96,35 @@ test("check lists data product owners and unenforced quality rules", () => {
     /Data products/,
   );
 });
+
+test("check summarises quality rule coverage by enforcement mode", () => {
+  const text = terminal(
+    result("validate", {
+      mode: "strict",
+      evidence: "offline",
+      dataProducts: [
+        {
+          contract: "orders",
+          status: "active",
+          owners: ["ana"],
+          qualityRules: 2,
+        },
+      ],
+      quality: {
+        summary: {
+          rules: 4,
+          atLoad: 1,
+          afterLoad: 1,
+          unsupported: 2,
+          documentation: 0,
+        },
+        rules: [],
+      },
+    }),
+  );
+  assert.match(
+    text,
+    /Quality rules: 4 \(1 at load, 1 after load, 2 not enforced by the target\)\./,
+  );
+  assert.doesNotMatch(text, /recorded in contracts but not yet enforced/);
+});
