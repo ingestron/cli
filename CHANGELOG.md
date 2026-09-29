@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.17.1
+
+- Add `adf` and `databricks` official provider names, resolving to the public
+  `ingestron/provider-adf` and `ingestron/provider-databricks` releases through the
+  qualified catalogue. Both providers generate files only and never deploy.
+
 ## 0.17.0
 
 - Bind one ingestion flow to named execution profiles with `--flow` and `--profile`.
