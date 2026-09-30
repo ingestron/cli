@@ -376,6 +376,12 @@ test("database connector short references resolve their tagged connector package
     "stripe",
     "sharepoint",
     "onedrive",
+    "s3",
+    "gcs",
+    "sftp",
+    "salesforce",
+    "hubspot",
+    "jira",
   ] as const) {
     assert.equal(officialPlugins[name].kind, "connector");
     const value = {

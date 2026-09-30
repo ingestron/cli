@@ -251,3 +251,41 @@ test("check shows a bridge as one route from the landing to the ingesting provid
     /sales: erp \(sql-server\) bridge: lands on landing, ingests on processing via snapshot-land@v1 → snapshot-publication@v1 → snapshot-with-history@v1 \[preview, included in platform pricing\]/,
   );
 });
+
+test("discover lists drafts, skipped fields and provider assets", () => {
+  const drafts = terminal(
+    result("discover", {
+      flow: "sales",
+      route: "portable",
+      tables: [
+        {
+          table: "customers",
+          file: "contracts/sales/customers.odcs.yaml",
+          fields: 3,
+          keys: ["id"],
+          skipped: [
+            { name: "payload", reason: "unsupported source type jsonb" },
+          ],
+        },
+      ],
+      next: "Review each draft.",
+    }),
+  );
+  assert.match(
+    drafts,
+    /customers: 3 fields → contracts\/sales\/customers\.odcs\.yaml \(source keys: id\)/,
+  );
+  assert.match(drafts, /skipped payload: unsupported source type jsonb/);
+  const provider = terminal(
+    result("discover", {
+      flow: "sales",
+      route: "bridge metadata on landing",
+      tables: [],
+      files: ["build/discovery/sales/template.json"],
+      review: ["Grant the factory metadata-output permissions"],
+      next: "Deploy template.json, then run ingestron discover --flow sales --from <file>.",
+    }),
+  );
+  assert.match(provider, /wrote build\/discovery\/sales\/template\.json/);
+  assert.match(provider, /review: Grant the factory/);
+});
