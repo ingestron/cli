@@ -369,7 +369,14 @@ test("ADF and Databricks short references resolve the public provider repositori
 test("database connector short references resolve their tagged connector packages", async (t) => {
   const f = fixture(t);
   const context = { root: f.root, allowWrite: true, allowNetwork: true };
-  for (const name of ["postgresql", "mysql", "oracle"] as const) {
+  for (const name of [
+    "postgresql",
+    "mysql",
+    "oracle",
+    "stripe",
+    "sharepoint",
+    "onedrive",
+  ] as const) {
     assert.equal(officialPlugins[name].kind, "connector");
     const value = {
       apiVersion: "ingestron.catalogue/v1",

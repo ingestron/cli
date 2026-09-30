@@ -52,6 +52,12 @@ export const officialPlugins = {
     path: "connectors/mysql/connector.yaml",
     tagPrefix: "mysql-",
   },
+  onedrive: {
+    kind: "connector",
+    repository: "ingestron/connectors",
+    path: "connectors/onedrive/connector.yaml",
+    tagPrefix: "onedrive-",
+  },
   oracle: {
     kind: "connector",
     repository: "ingestron/connectors",
@@ -64,11 +70,23 @@ export const officialPlugins = {
     path: "connectors/postgresql/connector.yaml",
     tagPrefix: "postgresql-",
   },
+  sharepoint: {
+    kind: "connector",
+    repository: "ingestron/connectors",
+    path: "connectors/sharepoint/connector.yaml",
+    tagPrefix: "sharepoint-",
+  },
   "sql-server": {
     kind: "connector",
     repository: "ingestron/connectors",
     path: "connectors/sql-server/connector.yaml",
     tagPrefix: "sql-server-",
+  },
+  stripe: {
+    kind: "connector",
+    repository: "ingestron/connectors",
+    path: "connectors/stripe/connector.yaml",
+    tagPrefix: "stripe-",
   },
 } as const;
 const catalogueUrl =
