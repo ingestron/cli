@@ -7,7 +7,12 @@
   Databricks); `check` shows it as one route and suggests it when the native
   route is billed separately. `check` now works on projects combining ADF and
   Databricks flows.
-- Official short names `stripe`, `sharepoint` and `onedrive`.
+- `ingestron discover` drafts data contracts from what a source offers, before
+  you write them: through the portable connector (also for native and bridge
+  connections that name a package), or from a platform metadata export with
+  `--from`.
+- Official short names `stripe`, `sharepoint`, `onedrive`, `s3`, `gcs`, `sftp`,
+  `salesforce`, `hubspot` and `jira`.
 
 ## 0.17.7
 

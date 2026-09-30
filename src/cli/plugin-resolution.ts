@@ -34,11 +34,29 @@ export const officialPlugins = {
     path: "connectors/files/connector.yaml",
     tagPrefix: "files-",
   },
+  gcs: {
+    kind: "connector",
+    repository: "ingestron/connectors",
+    path: "connectors/gcs/connector.yaml",
+    tagPrefix: "gcs-",
+  },
   github: {
     kind: "connector",
     repository: "ingestron/connectors",
     path: "connectors/github/connector.yaml",
     tagPrefix: "github-",
+  },
+  hubspot: {
+    kind: "connector",
+    repository: "ingestron/connectors",
+    path: "connectors/hubspot/connector.yaml",
+    tagPrefix: "hubspot-",
+  },
+  jira: {
+    kind: "connector",
+    repository: "ingestron/connectors",
+    path: "connectors/jira/connector.yaml",
+    tagPrefix: "jira-",
   },
   local: {
     kind: "provider",
@@ -69,6 +87,24 @@ export const officialPlugins = {
     repository: "ingestron/connectors",
     path: "connectors/postgresql/connector.yaml",
     tagPrefix: "postgresql-",
+  },
+  s3: {
+    kind: "connector",
+    repository: "ingestron/connectors",
+    path: "connectors/s3/connector.yaml",
+    tagPrefix: "s3-",
+  },
+  salesforce: {
+    kind: "connector",
+    repository: "ingestron/connectors",
+    path: "connectors/salesforce/connector.yaml",
+    tagPrefix: "salesforce-",
+  },
+  sftp: {
+    kind: "connector",
+    repository: "ingestron/connectors",
+    path: "connectors/sftp/connector.yaml",
+    tagPrefix: "sftp-",
   },
   sharepoint: {
     kind: "connector",
