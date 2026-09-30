@@ -366,6 +366,34 @@ test("ADF and Databricks short references resolve the public provider repositori
   }
 });
 
+test("database connector short references resolve their tagged connector packages", async (t) => {
+  const f = fixture(t);
+  const context = { root: f.root, allowWrite: true, allowNetwork: true };
+  for (const name of ["postgresql", "mysql", "oracle"] as const) {
+    assert.equal(officialPlugins[name].kind, "connector");
+    const value = {
+      apiVersion: "ingestron.catalogue/v1",
+      plugins: {
+        [name]: {
+          ...officialPlugins[name],
+          releases: [{ version: "1.0.0", coreVersions: [coreVersion] }],
+        },
+      },
+    };
+    const args = await resolvePluginArgs(
+      context,
+      "packages_install",
+      { reference: `${name}@1.0.0` },
+      async () => value,
+    );
+    assert.equal(
+      args.reference,
+      `ingestron/connectors/connectors/${name}/connector.yaml@1.0.0`,
+    );
+    assert.equal(args.tagPrefix, `${name}-`);
+  }
+});
+
 test("SQL Server short references resolve only the qualified source package", async (t) => {
   const f = fixture(t);
   const context = { root: f.root, allowWrite: true, allowNetwork: true };

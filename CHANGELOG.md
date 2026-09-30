@@ -7,6 +7,8 @@
   own ingestion standard, with no silent fallback. `check` lists each flow's
   source, route and reference record (licence, cost, access, maturity) and the
   other routes available. Stale reference records are flagged.
+- Official short names `postgresql`, `mysql` and `oracle` for the new database
+  connectors.
 
 ## 0.17.6
 

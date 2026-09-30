@@ -46,6 +46,24 @@ export const officialPlugins = {
     path: "plugin/provider.yaml",
     tagPrefix: "",
   },
+  mysql: {
+    kind: "connector",
+    repository: "ingestron/connectors",
+    path: "connectors/mysql/connector.yaml",
+    tagPrefix: "mysql-",
+  },
+  oracle: {
+    kind: "connector",
+    repository: "ingestron/connectors",
+    path: "connectors/oracle/connector.yaml",
+    tagPrefix: "oracle-",
+  },
+  postgresql: {
+    kind: "connector",
+    repository: "ingestron/connectors",
+    path: "connectors/postgresql/connector.yaml",
+    tagPrefix: "postgresql-",
+  },
   "sql-server": {
     kind: "connector",
     repository: "ingestron/connectors",
