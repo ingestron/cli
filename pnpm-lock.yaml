@@ -11,8 +11,8 @@ importers:
         specifier: 1.7.0
         version: 1.7.0
       "@ingestron/core":
-        specifier: 0.12.13
-        version: 0.12.13
+        specifier: 0.12.14
+        version: 0.12.14
       "@modelcontextprotocol/sdk":
         specifier: 1.30.0
         version: 1.30.0(zod@4.6.5)
@@ -315,10 +315,10 @@ packages:
     peerDependencies:
       hono: ^4
 
-  "@ingestron/core@0.12.13":
+  "@ingestron/core@0.12.14":
     resolution:
       {
-        integrity: sha512-kd5tyRrTu+ULgRsfg1B2Q73Lt9up9KaFLgxca2lwn05SWEQ2LKz7XYusP/LjtgfuPw9Bimwc8s8tHZRY+wZD5Q==,
+        integrity: sha512-sGfYqxGquMLdZ4oo8ydoX43w+lmSte8lZptWCAyNKB5DzipKIGpsnTvkGggoUL14c7/5SY20C4i0a8DTo1vNxA==,
       }
     engines: { node: ">=22.12.0" }
 
@@ -1406,7 +1406,7 @@ snapshots:
     dependencies:
       hono: 4.13.7
 
-  "@ingestron/core@0.12.13":
+  "@ingestron/core@0.12.14":
     dependencies:
       "@lezer/python": 1.1.19
       ajv: 8.20.0
