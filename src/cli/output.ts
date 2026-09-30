@@ -268,6 +268,32 @@ export function terminal(
           .join("") +
         `\nUse ingestron run status ${clean(value.id)} --verbose for environment paths and details.`
       );
+    case "discover":
+      return (
+        `Discovered ${clean(value.flow)} (${clean(value.route)}):` +
+        (value.tables ?? [])
+          .map(
+            (t: any) =>
+              `\n  ${clean(t.table)}: ${Number(t.fields)} fields → ${clean(t.file)}` +
+              (t.keys?.length
+                ? ` (source keys: ${t.keys.map(clean).join(", ")})`
+                : "") +
+              (t.skipped ?? [])
+                .slice(0, 10)
+                .map(
+                  (s: any) =>
+                    `\n    skipped ${clean(s.name)}: ${clean(s.reason)}`,
+                )
+                .join(""),
+          )
+          .join("") +
+        (value.files ?? []).map((f: any) => `\n  wrote ${clean(f)}`).join("") +
+        (value.review ?? [])
+          .slice(0, 10)
+          .map((r: any) => `\n  review: ${clean(r)}`)
+          .join("") +
+        `\nNext: ${clean(value.next)}`
+      );
     case "run":
     case "run_status":
       return `Run ${clean(value.id)}: ${clean(value.status)} (${clean(value.action)}).\nTarget: ${clean(value.configuration)}; flows: ${value.flows.map(clean).join(", ")}.${runQualityLine(value.result?.flows)}\nUse ingestron run status ${clean(value.id)} to inspect the receipt.`;

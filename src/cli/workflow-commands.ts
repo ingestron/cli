@@ -305,6 +305,34 @@ export function workflowCommands(app: Command, host: Host) {
         ...(secretsFile ? { envFile: secretsFile } : {}),
       }),
     );
+  app
+    .command("discover")
+    .description(
+      "List every field a flow's source offers and write draft contracts for review",
+    )
+    .requiredOption("--flow <id>", "Ingestion flow to discover")
+    .option(
+      "--from <file>",
+      "Use a source catalogue or exported metadata rows instead of reading the source",
+    )
+    .option("--out <directory>", "Directory for draft contracts", "contracts")
+    .option(
+      "--local <configuration>",
+      "Local provider configuration used for native or bridge connections",
+    )
+    .option("--accept-keys", "Mark the source's primary keys in the drafts")
+    .option("--python <path>", "Optional Python 3.12 bootstrap override")
+    .option(
+      "--secrets-file <file>",
+      "Project-relative dotenv file; only declared secret names are passed",
+    )
+    .action(({ secretsFile, acceptKeys, ...options }) =>
+      run("discover", {
+        ...options,
+        acceptKeys: !!acceptKeys,
+        ...(secretsFile ? { envFile: secretsFile } : {}),
+      }),
+    );
   execution
     .command("status <id>")
     .description("Read the durable local run receipt")
