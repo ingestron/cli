@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.17.8
+
+- Pin core 0.12.14. Bridge routes: a connection with `route: bridge` lands a
+  source on one platform (such as ADF) for a flow on another (such as
+  Databricks); `check` shows it as one route and suggests it when the native
+  route is billed separately. `check` now works on projects combining ADF and
+  Databricks flows.
+- Official short names `stripe`, `sharepoint` and `onedrive`.
+
 ## 0.17.7
 
 - Pin core 0.12.13. Connections can name a source `kind` and a `route`
