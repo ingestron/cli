@@ -156,3 +156,59 @@ test("run summaries report pre-commit quality results by rule and count", () => 
   delete (value.result.flows[0] as any).quality;
   assert.doesNotMatch(terminal(result("run", value)), /Quality/);
 });
+test("check summarises source routes with maturity and cost", () => {
+  const reference = (
+    maturity: string,
+    cost: string,
+    verified = "2026-09-30",
+  ) => ({
+    maturity,
+    cost: { model: cost },
+    verified,
+  });
+  const value = {
+    mode: "strict",
+    sources: [
+      {
+        flow: "sales",
+        connection: "erp",
+        kind: "sql-server",
+        selected: {
+          route: "portable",
+          configuration: "local",
+          package: "sql-server@1.4.0",
+          reference: reference("preview", "none"),
+        },
+        alternative: {
+          route: "native",
+          configuration: "adf",
+          standards: ["snapshot-land@v1"],
+          reference: reference("preview", "included", "2020-01-01"),
+        },
+      },
+      {
+        flow: "issues",
+        connection: "gh",
+        kind: "github",
+        selected: {
+          route: "portable",
+          configuration: "local",
+          package: "github@1.33.1",
+        },
+      },
+    ],
+  };
+  const text = terminal(result("validate", value));
+  assert.match(
+    text,
+    /sales: erp \(sql-server\) portable sql-server@1\.4\.0 on local \[preview, no extra cost\]/,
+  );
+  assert.match(
+    text,
+    /Also available: native on adf via snapshot-land@v1 \[preview, included in platform pricing, record checked 2020-01-01\]/,
+  );
+  assert.match(
+    text,
+    /issues: gh \(github\) portable github@1\.33\.1 on local \[no reference record\]/,
+  );
+});

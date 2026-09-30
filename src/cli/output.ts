@@ -72,6 +72,42 @@ function runQualityLine(flows: unknown): string {
       : ", all passed"
   }.`;
 }
+// Source routes from core (PB-064); absent with older core versions.
+const costLabel: Record<string, string> = {
+  none: "no extra cost",
+  included: "included in platform pricing",
+  "separately-billed": "billed separately",
+};
+function routeLabel(route: any): string {
+  const r = route?.reference;
+  const via =
+    route?.route === "native"
+      ? `native on ${clean(route.configuration)} via ${(route.standards ?? []).map(clean).join(", ")}`
+      : `portable ${clean(route?.package ?? "connector")} on ${clean(route?.configuration)}`;
+  if (!r) return `${via} [no reference record]`;
+  const stale =
+    Date.now() - new Date(`${r.verified}T00:00:00Z`).getTime() >
+    180 * 86_400_000;
+  return `${via} [${clean(r.maturity)}, ${costLabel[r.cost?.model] ?? clean(r.cost?.model)}${stale ? `, record checked ${clean(r.verified)}` : ""}]`;
+}
+function sourceLines(sources: unknown): string {
+  if (!Array.isArray(sources) || !sources.length) return "";
+  return (
+    "\nSources:" +
+    sources
+      .slice(0, 20)
+      .map(
+        (s: any) =>
+          `\n  ${clean(s.flow)}: ${clean(s.connection)} (${clean(s.kind)}) ${routeLabel(s.selected)}` +
+          (s.alternative
+            ? `\n    Also available: ${routeLabel(s.alternative)}`
+            : ""),
+      )
+      .join("") +
+    (sources.length > 20 ? `\n  … ${sources.length - 20} more` : "") +
+    "\nUse --json for every route with documentation, licence, cost and access."
+  );
+}
 function pluginLabel(reference: string): string {
   for (const [name, entry] of Object.entries(officialPlugins)) {
     const prefixes = [
@@ -215,7 +251,8 @@ export function terminal(
       return value.mode === "draft"
         ? `Draft configuration checked (${value.flows} flows).\n${value.pending.length} unresolved inputs. Strict build readiness has not been checked.`
         : `Project checks passed${value.nodes === undefined ? "" : ` (${value.nodes} planned nodes)`}.\nValidation is local; no platform connection was tested.` +
-            dataProductLines(value.dataProducts, value.quality);
+            dataProductLines(value.dataProducts, value.quality) +
+            sourceLines(value.sources);
     case "doctor":
       return `Project ${clean(value.project)} (${clean(value.environment)})\n${value.pending.length} unresolved inputs.\n${clean(value.platformAccess)}\nNext: ${clean(value.next)}`;
     case "runtime_prepare":
