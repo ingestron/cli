@@ -212,3 +212,42 @@ test("check summarises source routes with maturity and cost", () => {
     /issues: gh \(github\) portable github@1\.33\.1 on local \[no reference record\]/,
   );
 });
+
+test("check shows a bridge as one route from the landing to the ingesting provider", () => {
+  const text = terminal(
+    result("validate", {
+      mode: "strict",
+      evidence: "offline",
+      nodes: 6,
+      digest: "x",
+      dataProducts: [],
+      quality: { summary: { total: 0 }, rules: [] },
+      sources: [
+        {
+          flow: "sales",
+          connection: "erp",
+          kind: "sql-server",
+          selected: {
+            route: "bridge",
+            via: "landing",
+            configuration: "processing",
+            standards: [
+              "snapshot-land@v1",
+              "snapshot-publication@v1",
+              "snapshot-with-history@v1",
+            ],
+            reference: {
+              maturity: "preview",
+              cost: { model: "included" },
+              verified: new Date().toISOString().slice(0, 10),
+            },
+          },
+        },
+      ],
+    }),
+  );
+  assert.match(
+    text,
+    /sales: erp \(sql-server\) bridge: lands on landing, ingests on processing via snapshot-land@v1 → snapshot-publication@v1 → snapshot-with-history@v1 \[preview, included in platform pricing\]/,
+  );
+});

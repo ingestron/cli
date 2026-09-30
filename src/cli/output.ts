@@ -83,7 +83,9 @@ function routeLabel(route: any): string {
   const via =
     route?.route === "native"
       ? `native on ${clean(route.configuration)} via ${(route.standards ?? []).map(clean).join(", ")}`
-      : `portable ${clean(route?.package ?? "connector")} on ${clean(route?.configuration)}`;
+      : route?.route === "bridge"
+        ? `bridge: lands on ${clean(route.via)}, ingests on ${clean(route.configuration)} via ${(route.standards ?? []).map(clean).join(" → ")}`
+        : `portable ${clean(route?.package ?? "connector")} on ${clean(route?.configuration)}`;
   if (!r) return `${via} [no reference record]`;
   const stale =
     Date.now() - new Date(`${r.verified}T00:00:00Z`).getTime() >
