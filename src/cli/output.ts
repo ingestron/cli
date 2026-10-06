@@ -6,7 +6,22 @@ import { stringify } from "yaml";
 import { officialPlugins } from "./plugin-resolution.js";
 import type { Result } from "@ingestron/core";
 export function exitCode(result: Result): number {
-  if (result.ok) return 0;
+  if (result.ok) {
+    if (
+      String(result.operation) === "execution_recover" &&
+      result.result?.status === "failed"
+    )
+      return 2;
+    const outcomes = result.result?.outcomes;
+    if (
+      String(result.operation).startsWith("scheduler_") &&
+      Array.isArray(outcomes)
+    ) {
+      if (outcomes.some((v: any) => v.status === "failed")) return 2;
+      if (outcomes.some((v: any) => v.status === "interrupted")) return 130;
+    }
+    return 0;
+  }
   const codes = result.diagnostics.map((d) => d.code);
   if (codes.includes("CANCELLED")) return 130;
   if (codes.includes("NOT_IMPLEMENTED")) return 4;
@@ -29,6 +44,10 @@ export function exitCode(result: Result): number {
 }
 const clean = (value: unknown): string =>
   String(value).replace(/[\u0000-\u001f\u007f-\u009f]/g, " ");
+function originalRecoveryHint(value: any) {
+  const command = value.action === "run" ? "run --retry" : "run recover";
+  return `\nSource outcome is unconfirmed; keep the original run and managed build.\nInspect the original run, then recover it with ingestron --environment ${clean(value.environment ?? "dev")} ${command} ${clean(value.id)}.`;
+}
 // Data product ownership from ODCS contracts; absent with older core versions.
 function dataProductLines(products: unknown, quality?: any): string {
   if (!Array.isArray(products) || !products.length) return "";
@@ -160,6 +179,26 @@ export function terminal(
     );
   if (value?.applied)
     return lines("Saved files", value.files, "No file changes needed.");
+  if (String(result.operation).startsWith("scheduler_"))
+    return schedulerSummary(String(result.operation), value);
+  if (
+    ["checkpoint_preview", "checkpoint_apply"].includes(
+      String(result.operation),
+    )
+  ) {
+    if (value.recoveryRequired === true || value.status === "indeterminate")
+      return `Checkpoint operation ${clean(value.id)}: outcome unconfirmed.${originalRecoveryHint(value)}`;
+    const migration = value.result?.flows?.[0]?.migration;
+    if (!migration)
+      return `Checkpoint operation ${clean(value.id)}: ${clean(value.status)}. Inspect its original run receipt.`;
+    const cursor = Object.entries(migration.head?.bookmarks ?? {})
+      .slice(0, 10)
+      .map(([stream, bookmark]) => `${clean(stream)}=${clean(bookmark)}`)
+      .join(", ");
+    return `Checkpoint ${migration.applied === true ? "migration applied" : "migration reviewed"} for ${clean(value.flows?.[0])}.\nRetained batch: ${clean(migration.head?.sequence)}; cursor: ${cursor}.\nReview digest: ${clean(migration.digest)}.\n${migration.applied === true ? "Continue with the current approved build; original batches remain unchanged." : "Apply this exact digest with the same current and previous build selection."}`;
+  }
+  if (String(result.operation) === "build_retain")
+    return `Retained build: ${clean(value.directory)}\n${clean(value.files)} files, ${clean(value.bytes)} bytes; original review and output preserved.\nContent digest: ${clean(value.contentDigest)}.\nUpgrade the working build; use this retained directory for checkpoint review.`;
   switch (result.operation) {
     case "plugin_browse":
       return (
@@ -258,6 +297,11 @@ export function terminal(
     case "doctor":
       return `Project ${clean(value.project)} (${clean(value.environment)})\n${value.pending.length} unresolved inputs.\n${clean(value.platformAccess)}\nNext: ${clean(value.next)}`;
     case "runtime_prepare":
+      if (value.recoveryRequired === true || value.status === "indeterminate")
+        return (
+          `Runtime ${clean(value.status)} for ${value.flows.map(clean).join(", ")}.` +
+          originalRecoveryHint(value)
+        );
       return (
         `Runtime ${clean(value.status)} for ${value.flows.map(clean).join(", ")}.` +
         (value.result?.flows ?? [])
@@ -296,7 +340,13 @@ export function terminal(
       );
     case "run":
     case "run_status":
-      return `Run ${clean(value.id)}: ${clean(value.status)} (${clean(value.action)}).\nTarget: ${clean(value.configuration)}; flows: ${value.flows.map(clean).join(", ")}.${runQualityLine(value.result?.flows)}\nUse ingestron run status ${clean(value.id)} to inspect the receipt.`;
+    case "execution_recover":
+      return (
+        `Run ${clean(value.id)}: ${clean(value.status)} (${clean(value.action)}).\nTarget: ${clean(value.configuration)}; flows: ${value.flows.map(clean).join(", ")}.` +
+        (value.recoveryRequired === true || value.status === "indeterminate"
+          ? originalRecoveryHint(value)
+          : `${runQualityLine(value.result?.flows)}\nUse ingestron run status ${clean(value.id)} to inspect the receipt.`)
+      );
     case "build":
       return `Built ${value.packages?.length ?? 1} project package(s) into ${clean(value.directory)}.\n${clean(value.evidence)}`;
     case "generate":
@@ -363,4 +413,114 @@ export function terminal(
       return "Schema available. Use --json for tools or --verbose to inspect it.";
   }
   return `${result.operation.replaceAll("_", " ")} completed.\nUse --json for structured data or --verbose for details.`;
+}
+
+function schedulerSummary(operation: string, value: any) {
+  if (operation === "scheduler_history") {
+    const entries = Array.isArray(value?.entries) ? value.entries : [];
+    return (
+      `Schedule history for ${clean(value?.flow)} (${value?.generation === "current" ? "current registration" : "archived registration"}): ${Number(value?.total) || 0} matching occurrences.\nPage ${(Number(value?.page) || 0) + 1} of ${Number(value?.pages) || 1}.\n` +
+      lines(
+        "Occurrences",
+        entries.map(
+          (w: any) =>
+            `${clean(w.at)}  ${clean(w.runId)}  ${clean(w.status)}  attempt ${Number(w.attempt) || 0}${w.errorCode ? `  ${clean(w.errorCode)}` : ""}`,
+        ),
+        "No matching occurrences.",
+      ) +
+      "\nUse --json for registration IDs and paging details."
+    );
+  }
+  const workers = Array.isArray(value?.workers)
+    ? value.workers
+    : value?.worker
+      ? [value.worker]
+      : [];
+  if (operation.startsWith("scheduler_worker_")) {
+    if (!workers.length)
+      return "No background schedule workers in this environment.";
+    return (
+      lines(
+        "Background schedule workers",
+        workers.flatMap((w: any) => {
+          const health = Array.isArray(w.health) ? w.health : [];
+          return [
+            `${clean(w.id)}  ${clean(w.status)}  ${Array.isArray(w.flows) ? w.flows.slice(0, 10).map(clean).join(", ") : ""}${w.alive === false ? "  process absent" : ""}${w.recoveryRequired ? "  recovery required" : ""}${w.stopRequested ? "  stop requested" : ""}`,
+            ...health.slice(0, 5).map((h: any) => {
+              const counts = [
+                "queued",
+                "running",
+                "succeeded",
+                "failed",
+                "interrupted",
+                "canceled",
+                "skipped",
+              ]
+                .filter(
+                  (status) =>
+                    Number.isInteger(h.counts?.[status]) &&
+                    h.counts[status] > 0,
+                )
+                .map((status) => `${h.counts[status]} ${status}`)
+                .join(", ");
+              return `  ${clean(h.flow)}: ${clean(h.status)}${h.errorCode ? `  ${clean(h.errorCode)}` : ""}  ${counts || "no occurrences"}`;
+            }),
+            ...(health.length > 5
+              ? [
+                  `  ${health.length - 5} more flows; use --json for complete health`,
+                ]
+              : []),
+          ];
+        }),
+        "No workers.",
+      ) +
+      (workers.some((w: any) => w.recoveryRequired)
+        ? "\nStop the lost driver explicitly; then recover its original occurrence before restarting dispatch."
+        : "")
+    );
+  }
+  const state =
+    value?.state ??
+    (value?.apiVersion === "ingestron.scheduler-state/v1" ? value : undefined);
+  const work = Array.isArray(state?.work) ? state.work : [];
+  const totals = [
+    "queued",
+    "running",
+    "succeeded",
+    "failed",
+    "interrupted",
+    "canceled",
+    "skipped",
+  ]
+    .map(
+      (status) =>
+        `${work.filter((w: any) => w.status === status).length} ${status}`,
+    )
+    .join(", ");
+  let summary = state
+    ? `Schedule ${clean(state.binding?.flow ?? "flow")}: ${state.enabled ? "enabled" : "paused"}.\n${totals}.`
+    : "No registered schedule; inspect and register the reviewed build first.";
+  if (Array.isArray(value?.outcomes)) {
+    summary +=
+      "\n" +
+      lines(
+        "Dispatched occurrences",
+        value.outcomes.map(
+          (w: any) =>
+            `${clean(w.runId)}  ${clean(w.status)}${w.errorCode ? `  ${clean(w.errorCode)}` : ""}`,
+        ),
+        "No occurrences dispatched.",
+      );
+    if (
+      value.outcomes.some(
+        (w: any) => w.status === "failed" || w.status === "interrupted",
+      )
+    )
+      summary +=
+        "\nInspect the source failure and retry the same occurrence; its claim is retained.";
+  }
+  if (operation === "scheduler_inspect")
+    summary +=
+      "\nReview the current build digest in --json before registration.";
+  return summary;
 }

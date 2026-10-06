@@ -6,6 +6,9 @@
 4. [Command reference](commands.md) for the implemented command groups.
 5. [Automation and MCP](automation.md) for machine output and permission controls.
 
+[Source access and delivery planning candidate](source-access.md) describes the
+installed local qualification and its unpublished dependency boundary.
+
 For maintainers: [contributing](../CONTRIBUTING.md) and [release procedure](release.md).
 Shared schema/plugin implementation is documented in
 [core](https://github.com/ingestron/core); platform-specific behaviour belongs to

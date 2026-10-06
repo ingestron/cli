@@ -1,0 +1,321 @@
+{
+  "result": "passed",
+  "phase": "client",
+  "candidate": {
+    "cli": "0.17.18",
+    "core": "0.12.43",
+    "declaredCore": "0.12.14",
+    "privateOverride": true
+  },
+  "provider": "ingestron/provider-local/plugin/provider.yaml@0.4.14",
+  "archives": {
+    "CORE_ARCHIVE": {
+      "path": "/Users/sacode/sa.projects/intentlabs/repo/ingestron/repo/.studio-finalisation-20261005/artifacts/source-stream-runtime-v1/ingestron-core-0.12.43.tgz",
+      "sha256": "5da86c78e07a4cd8477073e35edf81e98f4fe7b8cd7039eb7ed903c07adafd92"
+    },
+    "CLI_ARCHIVE": {
+      "path": "/Users/sacode/sa.projects/intentlabs/repo/ingestron/repo/.studio-finalisation-20261005/artifacts/checkpoint-runtime-v2/ingestron-0.17.18.tgz",
+      "sha256": "f5c60ff22d0e9ffc73f90d44b1594ca0e1e045a992936ddd7d69ba82d35d85c6"
+    }
+  },
+  "archiveParity": {
+    "CORE_ARCHIVE": 156,
+    "CLI_ARCHIVE": 29
+  },
+  "sources": [
+    {
+      "id": "files",
+      "reference": "ingestron/connectors/connectors/files/connector.yaml@1.5.9",
+      "result": "passed",
+      "stage": "close",
+      "checks": [
+        "Read-only, write-only and execute-only MCP sessions hide and refuse source reads; SDK and CLI require both explicit permissions without receipt or output writes",
+        "Installed SDK, CLI and actual stdio MCP return identical locked capabilities, source fingerprint and exact execution provider without reading records",
+        "All three installed entry points refuse malformed bounds and caller root, environment or SQL fields; MCP runtime preparation separately requires network authority",
+        "SDK, CLI and MCP dispatch actual source test, bounded inventory and selected metadata to the same locked runtime and return identical metadata apart from independent receipt identifiers",
+        "Identical immediate scalar samples across SDK, CLI and stdio MCP preserve explicit source and field selection, one-row bounds and truncation; row values are omitted from proof",
+        "Source access leaves authored YAML and all existing generated output byte-identical; new receipts contain counts and metadata without sampled rows or synthetic credentials",
+        "Acceptance-owned source-access stdio MCP transport closed and its identified process exited",
+        "Acceptance-owned execute-only stdio MCP transport closed and its identified process exited",
+        "Acceptance-owned write-only stdio MCP transport closed and its identified process exited",
+        "Acceptance-owned read-only stdio MCP transport closed and its identified process exited"
+      ],
+      "candidate": {
+        "cli": "0.17.18",
+        "core": "0.12.43",
+        "declaredCore": "0.12.14",
+        "privateOverride": true
+      },
+      "provider": "ingestron/provider-local/plugin/provider.yaml@0.4.14",
+      "rowsInProof": false,
+      "liveAccounts": false,
+      "vendorQualified": false,
+      "browserInteraction": false
+    },
+    {
+      "id": "github",
+      "reference": "ingestron/connectors/connectors/github/connector.yaml@1.36.7",
+      "result": "passed",
+      "stage": "close",
+      "checks": [
+        "Read-only, write-only and execute-only MCP sessions hide and refuse source reads; SDK and CLI require both explicit permissions without receipt or output writes",
+        "Installed SDK, CLI and actual stdio MCP return identical locked capabilities, source fingerprint and exact execution provider without reading records",
+        "All three installed entry points refuse malformed bounds and caller root, environment or SQL fields; MCP runtime preparation separately requires network authority",
+        "SDK, CLI and MCP dispatch actual source test, bounded inventory and selected metadata to the same locked runtime and return identical metadata apart from independent receipt identifiers",
+        "Identical immediate scalar samples across SDK, CLI and stdio MCP preserve explicit source and field selection, one-row bounds and truncation; row values are omitted from proof",
+        "Source access leaves authored YAML and all existing generated output byte-identical; new receipts contain counts and metadata without sampled rows or synthetic credentials",
+        "Acceptance-owned source-access stdio MCP transport closed and its identified process exited",
+        "Acceptance-owned execute-only stdio MCP transport closed and its identified process exited",
+        "Acceptance-owned write-only stdio MCP transport closed and its identified process exited",
+        "Acceptance-owned read-only stdio MCP transport closed and its identified process exited"
+      ],
+      "candidate": {
+        "cli": "0.17.18",
+        "core": "0.12.43",
+        "declaredCore": "0.12.14",
+        "privateOverride": true
+      },
+      "provider": "ingestron/provider-local/plugin/provider.yaml@0.4.14",
+      "rowsInProof": false,
+      "liveAccounts": false,
+      "vendorQualified": false,
+      "browserInteraction": false
+    },
+    {
+      "id": "s3",
+      "reference": "ingestron/connectors/connectors/s3/connector.yaml@1.0.7",
+      "result": "passed",
+      "stage": "close",
+      "checks": [
+        "Read-only, write-only and execute-only MCP sessions hide and refuse source reads; SDK and CLI require both explicit permissions without receipt or output writes",
+        "Installed SDK, CLI and actual stdio MCP return identical locked capabilities, source fingerprint and exact execution provider without reading records",
+        "All three installed entry points refuse malformed bounds and caller root, environment or SQL fields; MCP runtime preparation separately requires network authority",
+        "SDK, CLI and MCP dispatch actual source test, bounded inventory and selected metadata to the same locked runtime and return identical metadata apart from independent receipt identifiers",
+        "Identical immediate scalar samples across SDK, CLI and stdio MCP preserve explicit source and field selection, one-row bounds and truncation; row values are omitted from proof",
+        "Source access leaves authored YAML and all existing generated output byte-identical; new receipts contain counts and metadata without sampled rows or synthetic credentials",
+        "Acceptance-owned source-access stdio MCP transport closed and its identified process exited",
+        "Acceptance-owned execute-only stdio MCP transport closed and its identified process exited",
+        "Acceptance-owned write-only stdio MCP transport closed and its identified process exited",
+        "Acceptance-owned read-only stdio MCP transport closed and its identified process exited"
+      ],
+      "candidate": {
+        "cli": "0.17.18",
+        "core": "0.12.43",
+        "declaredCore": "0.12.14",
+        "privateOverride": true
+      },
+      "provider": "ingestron/provider-local/plugin/provider.yaml@0.4.14",
+      "rowsInProof": false,
+      "liveAccounts": false,
+      "vendorQualified": false,
+      "browserInteraction": false
+    },
+    {
+      "id": "stripe",
+      "reference": "ingestron/connectors/connectors/stripe/connector.yaml@0.1.5",
+      "result": "passed",
+      "stage": "close",
+      "checks": [
+        "Read-only, write-only and execute-only MCP sessions hide and refuse source reads; SDK and CLI require both explicit permissions without receipt or output writes",
+        "Installed SDK, CLI and actual stdio MCP return identical locked capabilities, source fingerprint and exact execution provider without reading records",
+        "All three installed entry points refuse malformed bounds and caller root, environment or SQL fields; MCP runtime preparation separately requires network authority",
+        "SDK, CLI and MCP dispatch actual source test, bounded inventory and selected metadata to the same locked runtime and return identical metadata apart from independent receipt identifiers",
+        "Identical immediate scalar samples across SDK, CLI and stdio MCP preserve explicit source and field selection, one-row bounds and truncation; row values are omitted from proof",
+        "Source access leaves authored YAML and all existing generated output byte-identical; new receipts contain counts and metadata without sampled rows or synthetic credentials",
+        "Acceptance-owned source-access stdio MCP transport closed and its identified process exited",
+        "Acceptance-owned execute-only stdio MCP transport closed and its identified process exited",
+        "Acceptance-owned write-only stdio MCP transport closed and its identified process exited",
+        "Acceptance-owned read-only stdio MCP transport closed and its identified process exited"
+      ],
+      "candidate": {
+        "cli": "0.17.18",
+        "core": "0.12.43",
+        "declaredCore": "0.12.14",
+        "privateOverride": true
+      },
+      "provider": "ingestron/provider-local/plugin/provider.yaml@0.4.14",
+      "rowsInProof": false,
+      "liveAccounts": false,
+      "vendorQualified": false,
+      "browserInteraction": false
+    }
+  ],
+  "checks": [
+    {
+      "source": "files",
+      "check": "Read-only, write-only and execute-only MCP sessions hide and refuse source reads; SDK and CLI require both explicit permissions without receipt or output writes"
+    },
+    {
+      "source": "files",
+      "check": "Installed SDK, CLI and actual stdio MCP return identical locked capabilities, source fingerprint and exact execution provider without reading records"
+    },
+    {
+      "source": "files",
+      "check": "All three installed entry points refuse malformed bounds and caller root, environment or SQL fields; MCP runtime preparation separately requires network authority"
+    },
+    {
+      "source": "files",
+      "check": "SDK, CLI and MCP dispatch actual source test, bounded inventory and selected metadata to the same locked runtime and return identical metadata apart from independent receipt identifiers"
+    },
+    {
+      "source": "files",
+      "check": "Identical immediate scalar samples across SDK, CLI and stdio MCP preserve explicit source and field selection, one-row bounds and truncation; row values are omitted from proof"
+    },
+    {
+      "source": "files",
+      "check": "Source access leaves authored YAML and all existing generated output byte-identical; new receipts contain counts and metadata without sampled rows or synthetic credentials"
+    },
+    {
+      "source": "files",
+      "check": "Acceptance-owned source-access stdio MCP transport closed and its identified process exited"
+    },
+    {
+      "source": "files",
+      "check": "Acceptance-owned execute-only stdio MCP transport closed and its identified process exited"
+    },
+    {
+      "source": "files",
+      "check": "Acceptance-owned write-only stdio MCP transport closed and its identified process exited"
+    },
+    {
+      "source": "files",
+      "check": "Acceptance-owned read-only stdio MCP transport closed and its identified process exited"
+    },
+    {
+      "source": "github",
+      "check": "Read-only, write-only and execute-only MCP sessions hide and refuse source reads; SDK and CLI require both explicit permissions without receipt or output writes"
+    },
+    {
+      "source": "github",
+      "check": "Installed SDK, CLI and actual stdio MCP return identical locked capabilities, source fingerprint and exact execution provider without reading records"
+    },
+    {
+      "source": "github",
+      "check": "All three installed entry points refuse malformed bounds and caller root, environment or SQL fields; MCP runtime preparation separately requires network authority"
+    },
+    {
+      "source": "github",
+      "check": "SDK, CLI and MCP dispatch actual source test, bounded inventory and selected metadata to the same locked runtime and return identical metadata apart from independent receipt identifiers"
+    },
+    {
+      "source": "github",
+      "check": "Identical immediate scalar samples across SDK, CLI and stdio MCP preserve explicit source and field selection, one-row bounds and truncation; row values are omitted from proof"
+    },
+    {
+      "source": "github",
+      "check": "Source access leaves authored YAML and all existing generated output byte-identical; new receipts contain counts and metadata without sampled rows or synthetic credentials"
+    },
+    {
+      "source": "github",
+      "check": "Acceptance-owned source-access stdio MCP transport closed and its identified process exited"
+    },
+    {
+      "source": "github",
+      "check": "Acceptance-owned execute-only stdio MCP transport closed and its identified process exited"
+    },
+    {
+      "source": "github",
+      "check": "Acceptance-owned write-only stdio MCP transport closed and its identified process exited"
+    },
+    {
+      "source": "github",
+      "check": "Acceptance-owned read-only stdio MCP transport closed and its identified process exited"
+    },
+    {
+      "source": "s3",
+      "check": "Read-only, write-only and execute-only MCP sessions hide and refuse source reads; SDK and CLI require both explicit permissions without receipt or output writes"
+    },
+    {
+      "source": "s3",
+      "check": "Installed SDK, CLI and actual stdio MCP return identical locked capabilities, source fingerprint and exact execution provider without reading records"
+    },
+    {
+      "source": "s3",
+      "check": "All three installed entry points refuse malformed bounds and caller root, environment or SQL fields; MCP runtime preparation separately requires network authority"
+    },
+    {
+      "source": "s3",
+      "check": "SDK, CLI and MCP dispatch actual source test, bounded inventory and selected metadata to the same locked runtime and return identical metadata apart from independent receipt identifiers"
+    },
+    {
+      "source": "s3",
+      "check": "Identical immediate scalar samples across SDK, CLI and stdio MCP preserve explicit source and field selection, one-row bounds and truncation; row values are omitted from proof"
+    },
+    {
+      "source": "s3",
+      "check": "Source access leaves authored YAML and all existing generated output byte-identical; new receipts contain counts and metadata without sampled rows or synthetic credentials"
+    },
+    {
+      "source": "s3",
+      "check": "Acceptance-owned source-access stdio MCP transport closed and its identified process exited"
+    },
+    {
+      "source": "s3",
+      "check": "Acceptance-owned execute-only stdio MCP transport closed and its identified process exited"
+    },
+    {
+      "source": "s3",
+      "check": "Acceptance-owned write-only stdio MCP transport closed and its identified process exited"
+    },
+    {
+      "source": "s3",
+      "check": "Acceptance-owned read-only stdio MCP transport closed and its identified process exited"
+    },
+    {
+      "source": "stripe",
+      "check": "Read-only, write-only and execute-only MCP sessions hide and refuse source reads; SDK and CLI require both explicit permissions without receipt or output writes"
+    },
+    {
+      "source": "stripe",
+      "check": "Installed SDK, CLI and actual stdio MCP return identical locked capabilities, source fingerprint and exact execution provider without reading records"
+    },
+    {
+      "source": "stripe",
+      "check": "All three installed entry points refuse malformed bounds and caller root, environment or SQL fields; MCP runtime preparation separately requires network authority"
+    },
+    {
+      "source": "stripe",
+      "check": "SDK, CLI and MCP dispatch actual source test, bounded inventory and selected metadata to the same locked runtime and return identical metadata apart from independent receipt identifiers"
+    },
+    {
+      "source": "stripe",
+      "check": "Identical immediate scalar samples across SDK, CLI and stdio MCP preserve explicit source and field selection, one-row bounds and truncation; row values are omitted from proof"
+    },
+    {
+      "source": "stripe",
+      "check": "Source access leaves authored YAML and all existing generated output byte-identical; new receipts contain counts and metadata without sampled rows or synthetic credentials"
+    },
+    {
+      "source": "stripe",
+      "check": "Acceptance-owned source-access stdio MCP transport closed and its identified process exited"
+    },
+    {
+      "source": "stripe",
+      "check": "Acceptance-owned execute-only stdio MCP transport closed and its identified process exited"
+    },
+    {
+      "source": "stripe",
+      "check": "Acceptance-owned write-only stdio MCP transport closed and its identified process exited"
+    },
+    {
+      "source": "stripe",
+      "check": "Acceptance-owned read-only stdio MCP transport closed and its identified process exited"
+    }
+  ],
+  "matrixSize": 16,
+  "selectedSize": 4,
+  "liveAccounts": false,
+  "vendorQualified": false,
+  "browserInteraction": false,
+  "config": "repo/.studio-finalisation-20261005/fixtures/source-runtime-matrix-wCSc4w/acceptance.json",
+  "clientAdapter": {
+    "path": "/Users/sacode/sa.projects/intentlabs/repo/ingestron/repo/.studio-finalisation-20261005/artifacts/source-mcp-harness-v2/adapter.mjs",
+    "sha256": "4969c909bbcc150dff8646c735dfc007b9234b38e239e435f8943b9be728c5f5"
+  },
+  "transportFixtureSha256": "ce67ebc1f766ca984cb4668b5d807ead3b85034b25dd7f3aa2852141cdf33282",
+  "fixtureHooksRemoved": true,
+  "transportRequests": 30,
+  "allSixteenComplete": false,
+  "allSixteenClientCasesPassed": false,
+  "updatedAt": "2026-10-05T09:32:52Z"
+}

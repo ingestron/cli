@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { spawnSync, execFileSync } from "node:child_process";
+import { spawn, spawnSync, execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 import { readFileSync, existsSync, rmSync, writeFileSync } from "node:fs";
 import { parse, stringify } from "yaml";
@@ -26,6 +26,24 @@ test("command help exposes implemented operations and rejects retired aliases", 
     assert.doesNotMatch(help.stdout, new RegExp(`^  ${retired}\\b`, "m"));
     assert.notEqual(run(f.root, group, retired).status, 0);
   }
+  const governance = run(f.root, "governance", "check", "--help");
+  assert.equal(governance.status, 0);
+  assert.match(governance.stdout, /--flow/);
+  const policy = run(f.root, "governance", "policy", "--help");
+  assert.equal(policy.status, 0);
+  assert.match(policy.stdout, /--file/);
+  for (const group of ["flow", "contract"]) {
+    const locate = run(f.root, group, "locate", "--help");
+    assert.equal(locate.status, 0);
+    assert.match(locate.stdout, /exact/i);
+  }
+  const grouped = run(f.root, "connection", "flow-review", "--help");
+  assert.equal(grouped.status, 0);
+  assert.match(grouped.stdout, /--grouped/);
+  assert.match(grouped.stdout, /--group-fields/);
+  const selected = run(f.root, "connection", "drafts", "--help");
+  assert.equal(selected.status, 0);
+  assert.match(selected.stdout, /500/);
   const tables = run(f.root, "--json", "table", "list");
   assert.equal(tables.status, 0);
   assert.deepEqual(JSON.parse(tables.stdout).result, [
@@ -388,4 +406,81 @@ test("installed core selects a named execution profile without changing logical 
   );
   assert.notEqual(invalid.status, 0);
   assert.match(invalid.stdout, /PROFILE/);
+});
+
+test("malformed source JSON fails before execution without echoing values", (t) => {
+  const f = fixture(t);
+  const project = readFileSync(resolve(f.root, "project.yaml"), "utf8");
+  for (const [command, flag] of [
+    ["inventory", "--scope"],
+    ["test", "--source"],
+    ["metadata", "--tables"],
+    ["metadata", "--options"],
+    ["drafts", "--options"],
+  ]) {
+    const result = run(
+      f.root,
+      "--json",
+      "connection",
+      command,
+      "sales",
+      flag,
+      '{"PRIVATE_OPTION_VALUE":',
+    );
+    assert.notEqual(result.status, 0);
+    const output = JSON.parse(result.stdout);
+    assert.equal(output.ok, false);
+    assert.match(output.diagnostics[0].message, /Invalid JSON option/);
+    assert.doesNotMatch(result.stdout + result.stderr, /PRIVATE_OPTION_VALUE/);
+    assert.equal(
+      readFileSync(resolve(f.root, "project.yaml"), "utf8"),
+      project,
+    );
+    assert.equal(
+      existsSync(resolve(f.root, ".ingestron/source-access")),
+      false,
+    );
+  }
+});
+
+test("an early-closing pipe preserves successful help and failed-command exit status without a stack trace", async (t) => {
+  const f = fixture(t);
+  for (const [args, output] of [
+    [["--help"], "stdout"],
+    [["--json", "--help"], "stdout"],
+    [["unsupported-command"], "stderr"],
+    [["--json", "unsupported-command"], "stdout"],
+  ] as const) {
+    const normal = run(f.root, ...args);
+    assert.equal(normal.signal, null);
+    const child = spawn(
+      process.execPath,
+      [cli, "--project", f.root, "--no-input", ...args],
+      { stdio: ["ignore", "pipe", "pipe"] },
+    );
+    let captured = "";
+    const retained = output === "stdout" ? child.stderr : child.stdout;
+    retained.on("data", (chunk) => {
+      captured += chunk.toString();
+    });
+    child[output].destroy();
+    const timer = setTimeout(() => child.kill("SIGKILL"), 15000);
+    try {
+      const result = await new Promise<{
+        code: number | null;
+        signal: NodeJS.Signals | null;
+      }>((resolve, reject) => {
+        child.once("error", reject);
+        child.once("close", (code, signal) => resolve({ code, signal }));
+      });
+      assert.equal(result.signal, null, args.join(" "));
+      assert.equal(result.code, normal.status, args.join(" "));
+      assert.doesNotMatch(
+        captured,
+        /EPIPE|Unhandled 'error' event|node:events/,
+      );
+    } finally {
+      clearTimeout(timer);
+    }
+  }
 });

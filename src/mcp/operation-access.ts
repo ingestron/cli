@@ -1,0 +1,34 @@
+/** Transport permissions are conservative even before a new core is installed. */
+const executions = new Set([
+  "run",
+  "discover",
+  "runtime_prepare",
+  "execution_recover",
+  "checkpoint_preview",
+  "checkpoint_apply",
+  "connection_runtime_prepare",
+  "connection_test",
+  "connection_inventory",
+  "connection_metadata",
+  "connection_sample",
+  "connection_drafts",
+  "scheduler_register",
+  "scheduler_tick",
+  "scheduler_pause",
+  "scheduler_cancel",
+  "scheduler_retry",
+  "scheduler_worker_start",
+  "scheduler_worker_stop",
+]);
+const writes = new Set([
+  ...executions,
+  "apply",
+  "generate",
+  "build",
+  "build_retain",
+  "packages_install",
+  "connection_contracts",
+]);
+export function operationAccess(name: string) {
+  return { execution: executions.has(name), write: writes.has(name) };
+}

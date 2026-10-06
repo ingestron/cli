@@ -289,3 +289,54 @@ test("discover lists drafts, skipped fields and provider assets", () => {
   assert.match(provider, /wrote build\/discovery\/sales\/template\.json/);
   assert.match(provider, /review: Grant the factory/);
 });
+
+test("uncertain run status names the original recovery identity without claiming a quality pass", () => {
+  const value = {
+    id: "original",
+    status: "indeterminate",
+    action: "run",
+    configuration: "local",
+    environment: "test",
+    flows: ["orders"],
+    recoveryRequired: true,
+    result: {
+      flows: [{ quality: [{ id: "private-rule", passed: true, value: 0 }] }],
+    },
+  };
+  const text = terminal(result("run_status", value));
+  assert.match(text, /Source outcome is unconfirmed/);
+  assert.match(text, /ingestron --environment test run --retry original/);
+  assert.doesNotMatch(text, /Quality|private-rule|all passed/);
+});
+
+test("uncertain setup operations name acknowledgement recovery rather than data replay", () => {
+  for (const action of [
+    "prepare",
+    "catalogue",
+    "discover",
+    "review",
+    "approve",
+  ]) {
+    const value = {
+      id: "9-original",
+      status: "indeterminate",
+      action,
+      configuration: "local",
+      environment: "test",
+      flows: ["orders"],
+      recoveryRequired: true,
+      result: { flows: [{ quality: [{ id: "private-rule", passed: true }] }] },
+    };
+    for (const operation of [
+      "run_status",
+      ...(action === "prepare" ? ["runtime_prepare"] : []),
+    ]) {
+      const text = terminal(result(operation, value));
+      assert.match(text, /ingestron --environment test run recover 9-original/);
+      assert.doesNotMatch(
+        text,
+        /--retry|Quality|private-rule|all passed|Python/,
+      );
+    }
+  }
+});

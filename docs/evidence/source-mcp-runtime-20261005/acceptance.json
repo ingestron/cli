@@ -1,0 +1,104 @@
+{
+  "apiVersion": "ingestron.installed-source-client-acceptance/v1",
+  "date": "2026-10-05",
+  "result": "passed",
+  "complete": false,
+  "scope": "Installed SDK, CLI operation and actual stdio MCP source-access parity",
+  "candidate": {
+    "cli": "0.17.18",
+    "core": "0.12.43",
+    "declaredCore": "0.12.14",
+    "privateOverride": true
+  },
+  "provider": "ingestron/provider-local/plugin/provider.yaml@0.4.14",
+  "sources": 16,
+  "scenarioGroups": 96,
+  "mcpProcessClosures": 64,
+  "checks": 160,
+  "proof": "installed-mcp.json",
+  "frozenHarness": "harness.json",
+  "archives": {
+    "CORE_ARCHIVE": {
+      "path": "/Users/sacode/sa.projects/intentlabs/repo/ingestron/repo/.studio-finalisation-20261005/artifacts/source-stream-runtime-v1/ingestron-core-0.12.43.tgz",
+      "sha256": "5da86c78e07a4cd8477073e35edf81e98f4fe7b8cd7039eb7ed903c07adafd92"
+    },
+    "CLI_ARCHIVE": {
+      "path": "/Users/sacode/sa.projects/intentlabs/repo/ingestron/repo/.studio-finalisation-20261005/artifacts/checkpoint-runtime-v2/ingestron-0.17.18.tgz",
+      "sha256": "f5c60ff22d0e9ffc73f90d44b1594ca0e1e045a992936ddd7d69ba82d35d85c6"
+    }
+  },
+  "archiveParity": {
+    "CORE_ARCHIVE": 156,
+    "CLI_ARCHIVE": 29
+  },
+  "configSha256": "13d6208e33ffb9e2d4729e7bba498b72030a23f1ff22f5174c51bb037577fa8a",
+  "sdk": {
+    "version": "1.30.0",
+    "files": {
+      "package.json": "0690cbe02511a95d1ff199acf20b5a12ac4dfde1bbe30c82a0de73afa92dffc9",
+      "dist/cjs/client/index.js": "e2f909e827a6e08870b400f44f9e90f9545ef5655d6e10f9cc7d0a91a374af45",
+      "dist/cjs/client/stdio.js": "ab9d226de9deb01552e61f07c639593f29c5f8e6115076ece497d21b18075d30",
+      "dist/esm/server/mcp.js": "a5caaddfa0f6aadea64604aa57136bab6540298b846bbe861a80bf7392ae5aad"
+    }
+  },
+  "initialFailure": {
+    "path": "first-attempt.json",
+    "cause": "Harness CommonJS resolution could not load the import-only core export; repaired by resolving the installed package import export. No production semantics changed."
+  },
+  "owningGates": {
+    "cli": {
+      "result": "passed",
+      "command": "Node22 pnpm validate",
+      "path": "/Users/sacode/sa.projects/intentlabs/repo/ingestron/repo/.studio-finalisation-20261005/outputs/source-mcp-cli-validate-v1.log",
+      "sha256": "9d2ce39dea08e8f13b90ab6d3e7d0387db0820bd2fc7c85859e4a5c3ce8a5c20"
+    },
+    "connectors": {
+      "result": "passed",
+      "command": "Node22 pnpm validate",
+      "path": "/Users/sacode/sa.projects/intentlabs/repo/ingestron/repo/.studio-finalisation-20261005/outputs/source-mcp-connectors-validate-v1.log",
+      "sha256": "8a4b9e245bca51789c908a82921d3195a49154eae53de10eb82e8e961d07a094"
+    }
+  },
+  "productionUnchanged": {
+    "repo/cli/src/mcp/index.ts": "4171cd55b459f5bb561ac754f2488e5f69ea2b8f4eecbb7802d25f66f9ca46a7",
+    "repo/cli/src/mcp/operation-access.ts": "444a55455f8e2e01a5d5d62050ff8838d57670679edcb287976022e43eba33c8",
+    "repo/cli/src/cli/plugin-resolution.ts": "4110db7dbdfcc27bb43b548a2b339b7db25508c85729998296ca356be215cf74",
+    "repo/cli/package.json": "d34ef3b8ac5bfb515513f43fb9eb7c087a47aab29faa5de8d1862bf2b7f33f48",
+    "repo/core/src/core/operations.ts": "e8ebf2a0e96b0a10c59c0e341549934fc2b56838a20e3d19d9f9afac877cd543",
+    "repo/core/src/core/source-access.ts": "f46a9a3f70a19355846486a0f56b4f889644a008425c41a591452c53b84b2bac"
+  },
+  "ownerFiles": {
+    "repo/cli/scripts/runtime-matrix-mcp-acceptance.mjs": "4969c909bbcc150dff8646c735dfc007b9234b38e239e435f8943b9be728c5f5",
+    "repo/cli/docs/source-access.md": "1ba42afa467f1b2c79c001b780af08ce7f95230b7334516e11e33d88824507f7",
+    "repo/connectors/scripts/runtime-matrix-acceptance.py": "4eeb1a7ddfa968beb76a313680fddc69ca2518644a7362bee7bfe1e02435d6df"
+  },
+  "sampleRowsInProof": false,
+  "liveAccounts": false,
+  "browserInteraction": false,
+  "nativePlatformExecution": false,
+  "vendorQualified": false,
+  "limitations": [
+    "HTTP loopback fixtures",
+    "Four DB-API stand-ins",
+    "OpenSSH transport stand-in",
+    "No ingestion run or commit tested by this client adapter",
+    "Remaining browser, editor webview, native/vendor and independent engineer workflows remain open"
+  ],
+  "finalChecks": {
+    "programme": {
+      "result": "passed",
+      "path": "/Users/sacode/sa.projects/intentlabs/repo/ingestron/repo/.studio-finalisation-20261005/outputs/source-mcp-programme-final-v1.log",
+      "sha256": "4ec1028ac969f96fa054eb591616233e14a227e363a884604cef52f3a799092a"
+    },
+    "cliDocumentation": {
+      "result": "passed",
+      "path": "/Users/sacode/sa.projects/intentlabs/repo/ingestron/repo/.studio-finalisation-20261005/outputs/source-mcp-cli-final-v1.log",
+      "sha256": "be4a98cba468fb30e692684951f32f76bf5360fc4d80252ead40b1284f25d266"
+    },
+    "archiveParity": {
+      "result": "passed",
+      "path": "/Users/sacode/sa.projects/intentlabs/repo/ingestron/repo/.studio-finalisation-20261005/outputs/source-mcp-archive-final-v2.log",
+      "sha256": "5a37b9998f8e28e19c309325fcfea1b9ed1d5ff2b7f00a9ec8e8aeeae5fe0841"
+    }
+  }
+}

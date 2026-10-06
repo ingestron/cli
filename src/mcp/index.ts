@@ -1,3 +1,4 @@
+import { operationAccess } from "./operation-access.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { execute, operationSchemas, type OperationName } from "@ingestron/core";
@@ -18,16 +19,8 @@ export function createServer(
     },
   );
   for (const [name, schema] of Object.entries(operationSchemas)) {
-    const execution = ["run", "runtime_prepare"].includes(name);
+    const { execution, write } = operationAccess(name);
     if (execution && !allowExecute) continue;
-    const write = [
-      "apply",
-      "generate",
-      "build",
-      "packages_install",
-      "run",
-      "runtime_prepare",
-    ].includes(name);
     if (write && !allowWrite) continue;
     server.registerTool(
       `ingestron_${name}`,
@@ -62,12 +55,16 @@ export function createServer(
     "source",
     "flow",
     "delivery-index",
+    "delivery-plan",
+    "policy",
     "step",
     "environment",
     "activity",
     "provider",
     "extension-pack",
-  ] as const)
+  ] as const) {
+    if (!operationSchemas.schema.shape.name.options.includes(name as any))
+      continue;
     server.registerResource(
       `schema-${name}`,
       `ingestron://schemas/${name}`,
@@ -82,6 +79,7 @@ export function createServer(
         ],
       }),
     );
+  }
   return server;
 }
 export async function serve(

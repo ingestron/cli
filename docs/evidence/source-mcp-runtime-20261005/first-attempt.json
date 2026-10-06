@@ -1,0 +1,70 @@
+{
+  "result": "failed",
+  "phase": "client",
+  "candidate": {
+    "cli": "0.17.18",
+    "core": "0.12.43",
+    "declaredCore": "0.12.14",
+    "privateOverride": true
+  },
+  "provider": "ingestron/provider-local/plugin/provider.yaml@0.4.14",
+  "archives": {
+    "CORE_ARCHIVE": {
+      "path": "/Users/sacode/sa.projects/intentlabs/repo/ingestron/repo/.studio-finalisation-20261005/artifacts/source-stream-runtime-v1/ingestron-core-0.12.43.tgz",
+      "sha256": "5da86c78e07a4cd8477073e35edf81e98f4fe7b8cd7039eb7ed903c07adafd92"
+    },
+    "CLI_ARCHIVE": {
+      "path": "/Users/sacode/sa.projects/intentlabs/repo/ingestron/repo/.studio-finalisation-20261005/artifacts/checkpoint-runtime-v2/ingestron-0.17.18.tgz",
+      "sha256": "f5c60ff22d0e9ffc73f90d44b1594ca0e1e045a992936ddd7d69ba82d35d85c6"
+    }
+  },
+  "archiveParity": {
+    "CORE_ARCHIVE": 156,
+    "CLI_ARCHIVE": 29
+  },
+  "sources": [
+    {
+      "id": "files",
+      "result": "failed",
+      "reference": "ingestron/connectors/connectors/files/connector.yaml@1.5.9",
+      "failure": "Client adapter did not return a bounded JSON proof"
+    },
+    {
+      "id": "github",
+      "result": "failed",
+      "reference": "ingestron/connectors/connectors/github/connector.yaml@1.36.7",
+      "failure": "Client adapter did not return a bounded JSON proof"
+    },
+    {
+      "id": "s3",
+      "result": "failed",
+      "reference": "ingestron/connectors/connectors/s3/connector.yaml@1.0.7",
+      "failure": "Client adapter did not return a bounded JSON proof"
+    },
+    {
+      "id": "stripe",
+      "result": "failed",
+      "reference": "ingestron/connectors/connectors/stripe/connector.yaml@0.1.5",
+      "failure": "Client adapter did not return a bounded JSON proof"
+    }
+  ],
+  "checks": [],
+  "matrixSize": 16,
+  "selectedSize": 4,
+  "liveAccounts": false,
+  "vendorQualified": false,
+  "browserInteraction": false,
+  "config": "repo/.studio-finalisation-20261005/fixtures/source-runtime-matrix-wCSc4w/acceptance.json",
+  "clientAdapter": {
+    "path": "/Users/sacode/sa.projects/intentlabs/repo/ingestron/repo/.studio-finalisation-20261005/artifacts/source-mcp-harness-v1/adapter.mjs",
+    "sha256": "b08f4ba363f939070d41683dfc9e0829176360c3bbe81b9be65e6696ccfd3724"
+  },
+  "transportFixtureSha256": "ce67ebc1f766ca984cb4668b5d807ead3b85034b25dd7f3aa2852141cdf33282",
+  "fixtureHooksRemoved": true,
+  "transportRequests": 0,
+  "failure": {
+    "type": "AssertionError",
+    "message": "Some installed source journeys failed; inspect per-source proof"
+  },
+  "updatedAt": "2026-10-05T09:30:30Z"
+}
