@@ -28,6 +28,7 @@ const writes = new Set([
   "build_apply",
   "platform_binding_apply",
   "programme_save",
+  "programme_migration_apply",
   "platform_secret_set",
   "build_retain",
   "packages_install",
