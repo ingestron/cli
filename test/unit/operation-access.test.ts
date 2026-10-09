@@ -31,6 +31,7 @@ test("durable scheduling and discovery require both explicit MCP permissions", (
     "schedule_propose",
     "connection_access",
     "run_status",
+    "build_review",
   ])
     assert.deepEqual(
       operationAccess(name),
@@ -40,6 +41,10 @@ test("durable scheduling and discovery require both explicit MCP permissions", (
   for (const name of [
     "apply",
     "build",
+    "build_apply",
+    "platform_binding_apply",
+    "programme_save",
+    "platform_secret_set",
     "connection_contracts",
     "packages_install",
   ])
