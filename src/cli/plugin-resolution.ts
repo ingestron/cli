@@ -333,6 +333,20 @@ export async function executePluginOperation(
       args = await resolvePluginArgs(context, operation, parsed.data);
     }
     const result = await executeAsync(context, operation, args);
+    // Adapter-owned source identities are suggestions, never installed capability claims.
+    if (
+      ["package_library", "connector_library"].includes(String(operation)) &&
+      result.ok
+    )
+      result.result.sources = Object.entries(officialPlugins).map(
+        ([id, identity]) => ({
+          id,
+          kind: identity.kind,
+          repository: identity.repository,
+          manifest: identity.path,
+          tagPrefix: identity.tagPrefix,
+        }),
+      );
     // Keep custom manifest paths in every returned installable reference.
     if (operation === "plugin_versions" && result.ok) {
       const identity = Object.values(officialPlugins).find(

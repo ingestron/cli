@@ -20,6 +20,15 @@ import { terminal, exitCode } from "./output.js";
 import { decorate, banner, backgroundOperation } from "./presentation.js";
 import { executePluginOperation } from "./plugin-resolution.js";
 import { workflowCommands } from "./workflow-commands.js";
+import { schedulerCommands } from "./scheduler-commands.js";
+// A downstream reader may finish early. Preserve operation exit status and cleanup;
+// a closed output pipe is not a compiler failure and must not dump a stack trace.
+const outputError = (error: NodeJS.ErrnoException) => {
+  if (error.code !== "EPIPE") throw error;
+};
+process.stdout.on("error", outputError);
+process.stderr.on("error", outputError);
+
 const app = new Command()
   .name("ingestron")
   .description(
@@ -128,7 +137,16 @@ app
     for await (const chunk of process.stdin) {
       const value = Buffer.from(chunk);
       bytes += value.length;
-      check(bytes <= 1024 * 1024, "LIMIT", "Operation request exceeds 1 MiB");
+      check(
+        bytes <=
+          (name.startsWith("discovery_") || name.startsWith("ingestion_")
+            ? 16
+            : 1) *
+            1024 *
+            1024,
+        "LIMIT",
+        "Operation request exceeds its byte limit",
+      );
       chunks.push(value);
     }
     let request: unknown;
@@ -252,7 +270,15 @@ flow
   .option("--source-binding <id>", "Existing or new environment source binding")
   .option(
     "--input-dataset <id>",
-    "Published source dataset for a native SQL transformation",
+    "Published source dataset for a native transformation",
+  )
+  .option(
+    "--language <language>",
+    "Transformation logic language: sql or python",
+  )
+  .option(
+    "--transformation-settings <json>",
+    "Output settings declared by the installed provider",
   )
   .action(async (id, command) => {
     let standard = command.standard;
@@ -274,6 +300,10 @@ flow
       ...(command.sourceKind ? { sourceKind: command.sourceKind } : {}),
       ...(command.format ? { format: command.format } : {}),
       ...(command.inputDataset ? { inputDataset: command.inputDataset } : {}),
+      ...(command.language ? { language: command.language } : {}),
+      ...(command.transformationSettings
+        ? { transformationSettings: JSON.parse(command.transformationSettings) }
+        : {}),
       ...(command.sourceBinding
         ? { sourceBinding: command.sourceBinding }
         : {}),
@@ -732,6 +762,26 @@ app
       !!command.allowExecute,
     );
   });
+schedulerCommands(app, {
+  invoke: async (operation, request, permissions) => {
+    check(
+      Object.hasOwn(operationSchemas, operation),
+      "OPERATION",
+      "The installed core does not support this scheduling command; use a qualified core/CLI pair",
+    );
+    const result = await executePluginOperation(
+      {
+        ...context(),
+        allowWrite: permissions.write,
+        allowExecute: permissions.execute,
+        allowNetwork: false,
+      },
+      operation as OperationName,
+      request,
+    );
+    print(result, request);
+  },
+});
 workflowCommands(app, {
   context,
   run,
@@ -755,6 +805,9 @@ app.hook("preAction", (_root, command) => {
   check(
     new Set([
       "init",
+      "governance policy",
+      "delivery-plan edit",
+      "delivery-plan baseline",
       "source add",
       "source configure",
       "source prepare",
@@ -762,6 +815,7 @@ app.hook("preAction", (_root, command) => {
       "plugin configure",
       "connections add",
       "connections flow-add",
+      "connection flow-review",
       "plugin migrate",
       "config environment add",
       "flow table add",
@@ -771,6 +825,9 @@ app.hook("preAction", (_root, command) => {
       "advanced export",
       "flow add",
       "flow configure",
+      "flow schedule edit",
+      "flow schedule clear",
+      "flow ingestion",
       "step add",
       "table add",
       "table configure",

@@ -103,3 +103,21 @@ apply to the whole project.
 Inspect the diagnostic code and message rather than relying on exit status alone.
 CLI version `0.12.0` is separate from the legacy provider compatibility field
 `minimumCli: 4.2.0`; core documents that manifest ABI.
+
+### Locate shared definitions
+
+`ingestron flow locate <flow>` returns the physical flow, table and contract
+locations. `ingestron contract locate <flow> <table>` selects one contract.
+Each location contains a project-relative `path`, a JSON pointer as an array of
+path segments, and a document revision. Inline definitions and `$resolve`
+references use the same project fences.
+
+A field mapping draft's `contract` must identify that exact bound contract:
+`project.yaml#/flows/0/tables/orders/contract` for an inline definition, or
+`contracts.yaml#/orders` for a referenced fragment. `contract map <draft.json>`
+previews the change and preserves neighbouring definitions, comments, keys and
+quality rules. Applying the proposal rejects changed project or discovery inputs.
+
+Large source selections use `ingestron connection drafts <id> --tables '<json>'` with up to 500 explicit `{source,name}` selections. This reads schema metadata in batches of at most 100 and saves isolated contract drafts plus one complete durable selection. It requires receipt-write and execution authority; it reads no business rows. Output names must be unique across the whole selection.
+
+`ingestron connection flow-review <id> --grouped --flow <prefix> --receipt <id> --tables '<json>'` reviews up to 500 `{id,table,contract,receipt}` entries from those drafts. Groups contain at most 100 tables, sorted by output name. One group retains the requested flow name; multiple groups use `_001`, `_002` and so on. Use `--group-fields '["group"]'` for ADF ingestion group names or `'["pipeline"]'` for Databricks pipeline names. These explicitly named resource fields receive the same suffix to preserve distinct ownership. Review and apply the returned proposal once: any changed contract or metadata receipt rejects the entire save. `--dry-run` supports this review without applying it.

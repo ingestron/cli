@@ -7,7 +7,7 @@ import { type Context, type OperationName, type Result } from "@ingestron/core";
 import { check } from "@ingestron/core/adapter";
 interface Host {
   context: () => Context;
-  run: (name: OperationName, args?: any) => void;
+  run: (name: OperationName, args?: any, ctx?: Context) => void;
   author: (name: OperationName, args: any) => void;
   print: (result: Result, args?: any) => void;
   readData: (file: string) => any;
@@ -19,10 +19,180 @@ interface Host {
     label: string,
   ) => Promise<Result>;
 }
+/** Parsing failures never include source selection or connection values. */
+function reviewedJson(value: string) {
+  try {
+    return JSON.parse(value);
+  } catch {
+    throw new Error(
+      "Invalid JSON option; provide a complete reviewed JSON value",
+    );
+  }
+}
+/** Recovery accepts the original identity and cannot inherit fresh-run options. */
+export function operationRecoveryCommand(
+  app: Command,
+  execution: Command,
+  host: Pick<Host, "run" | "context">,
+) {
+  const { run, context } = host;
+  execution
+    .command("recover <id>")
+    .description(
+      "Acknowledge the original setup or checkpoint operation without repeating source work",
+    )
+    .action((id: string, _options: any, command: Command) => {
+      check(
+        ![
+          "from",
+          "provider",
+          "flow",
+          "profile",
+          "action",
+          "runId",
+          "retry",
+          "secretsFile",
+        ].some((key) => command.parent?.getOptionValueSource(key) === "cli"),
+        "SELECT",
+        "Original operation recovery uses its recorded build, action, identity and selection",
+      );
+      run(
+        "execution_recover" as OperationName,
+        { id },
+        {
+          ...context(),
+          allowWrite: !app.opts().dryRun,
+          allowExecute: !app.opts().dryRun,
+          allowNetwork: false,
+        },
+      );
+    });
+}
+/** Explicit review/apply operations never forward a secrets file or dependency authority. */
+export function checkpointMaintenanceCommands(
+  app: Command,
+  host: Pick<Host, "run" | "context">,
+) {
+  const checkpoint = app
+    .command("checkpoint")
+    .description(
+      "Review and apply an installed source's compatible runtime upgrade",
+    );
+  checkpoint
+    .command("retain")
+    .description(
+      "Retain a private copy of the managed build, review and output before upgrading",
+    )
+    .option("--from <directory>", "Original managed build", "build/generated")
+    .requiredOption("--to <directory>", "New separate baseline directory")
+    .option("--profile <id>", "Original build profile")
+    .action((options: any) =>
+      host.run(
+        "build_retain" as OperationName,
+        {
+          from: options.from,
+          to: options.to,
+          ...(options.profile ? { profile: options.profile } : {}),
+        },
+        {
+          ...host.context(),
+          allowWrite: !app.opts().dryRun,
+          allowExecute: false,
+          allowNetwork: false,
+        },
+      ),
+    );
+  for (const action of ["preview", "apply"] as const) {
+    const command = checkpoint
+      .command(action)
+      .requiredOption("--flow <id>", "One incremental flow")
+      .requiredOption(
+        "--previous <directory>",
+        "Retained unchanged previous managed build",
+      )
+      .option("--from <directory>", "Current managed build", "build/generated")
+      .option("--profile <id>", "Matching build profile")
+      .option("--run-id <id>", "Stable maintenance operation identity");
+    if (action === "apply")
+      command.requiredOption(
+        "--digest <sha256>",
+        "Digest returned by the reviewed checkpoint preview",
+      );
+    command.action((options: any) =>
+      host.run(
+        ("checkpoint_" + action) as OperationName,
+        {
+          flow: options.flow,
+          previous: options.previous,
+          from: options.from,
+          ...(options.profile ? { profile: options.profile } : {}),
+          ...(options.runId ? { runId: options.runId } : {}),
+          ...(action === "apply" ? { expectedDigest: options.digest } : {}),
+        },
+        {
+          ...host.context(),
+          allowWrite: !app.opts().dryRun,
+          allowExecute: !app.opts().dryRun,
+          allowNetwork: false,
+        },
+      ),
+    );
+  }
+}
 /** Implemented CLI workflows over the versioned core operation API. */
 export function workflowCommands(app: Command, host: Host) {
+  checkpointMaintenanceCommands(app, host);
   const { run, author, print, readData, context, canPrompt, answer, perform } =
     host;
+  const governance = app
+    .command("governance")
+    .description("Review contract ownership and project policy gaps");
+  governance
+    .command("check")
+    .option(
+      "--flow <id>",
+      "Check contracts for one flow; delivery definitions remain project-wide",
+    )
+    .action((options) => run("governance_check" as OperationName, options));
+  governance
+    .command("policy")
+    .requiredOption("--file <file>", "Reviewed project policy YAML or JSON")
+    .action((options) =>
+      author("policy_propose" as OperationName, {
+        policy: readData(options.file),
+      }),
+    );
+  const delivery = app
+    .command("delivery-plan")
+    .description("Review project requirements and work definitions");
+  delivery
+    .command("check")
+    .option(
+      "--path <file>",
+      "Plan YAML within this project",
+      "delivery-plan.yaml",
+    )
+    .option("--baseline <file>", "Previously reviewed plan YAML")
+    .action((options) => run("delivery_plan_check" as OperationName, options));
+  delivery
+    .command("edit")
+    .requiredOption("--file <file>", "Reviewed plan YAML or JSON")
+    .action((options) =>
+      author("delivery_plan_propose" as OperationName, {
+        plan: readData(options.file),
+      }),
+    );
+  delivery
+    .command("baseline")
+    .option("--path <file>", "Current plan", "delivery-plan.yaml")
+    .option(
+      "--baseline <file>",
+      "Baseline destination",
+      "delivery-plan.baseline.yaml",
+    )
+    .action((options) =>
+      author("delivery_plan_baseline" as OperationName, options),
+    );
   const source = app
     .command("source")
     .description(
@@ -93,6 +263,193 @@ export function workflowCommands(app: Command, host: Host) {
       "Metadata or ODCS file inside the project",
     )
     .action((id, options) => author("source_import", { id, ...options }));
+  const connection = (
+    app.commands.find((c) => c.name() === "connection") ??
+    app.command("connection")
+  ).description("Test access and discover metadata before defining flows");
+  const command = (name: string, operation: string, description: string) =>
+    connection
+      .command(name + " <id>")
+      .description(description)
+      .option(
+        "--executor <reference>",
+        "Exact installed source-access provider reference",
+      )
+      .option("--python <executable>", "Python 3.12 bootstrap executable")
+      .option(
+        "--secrets-file <file>",
+        "Private project-relative runtime secret file",
+      )
+      .action((id, { secretsFile, ...options }) =>
+        run(operation as OperationName, {
+          connection: id,
+          ...options,
+          ...(secretsFile ? { envFile: secretsFile } : {}),
+        }),
+      );
+  connection
+    .command("access <id>")
+    .description("Inspect locked source access methods")
+    .option("--executor <reference>", "Exact installed source-access provider")
+    .action((id, options) =>
+      run("connection_access" as OperationName, { connection: id, ...options }),
+    );
+  command(
+    "prepare",
+    "connection_runtime_prepare",
+    "Prepare hash-locked dependencies; does not contact the source",
+  );
+  command(
+    "test",
+    "connection_test",
+    "Test the configured connection without reading business records",
+  ).option("--source <json>", "Explicit file or object scope", reviewedJson);
+  command(
+    "inventory",
+    "connection_inventory",
+    "Browse table or declared object names without reading records",
+  )
+    .option("--query <text>", "Literal object name search")
+    .option("--schema <name>", "Exact database schema")
+    .option(
+      "--scope <json>",
+      "Inventory scope declared by the installed source, e.g. {directory,format}",
+      reviewedJson,
+    )
+    .option("--cursor <cursor>", "Opaque continuation from previous page")
+    .option("--limit <count>", "Page size, 1–200", Number);
+  command(
+    "metadata",
+    "connection_metadata",
+    "Read selected schemas; record sampling requires explicit source-declared options",
+  )
+    .requiredOption(
+      "--tables <json>",
+      "Array of reviewed source objects",
+      reviewedJson,
+    )
+    .option(
+      "--options <json>",
+      "Metadata options declared by the installed source; inspect connection access before enabling record sampling",
+      reviewedJson,
+    );
+  command(
+    "drafts",
+    "connection_drafts",
+    "Discover up to 500 explicit schemas in bounded batches and save one complete draft selection",
+  )
+    .requiredOption(
+      "--tables <json>",
+      "Array of {source,name} selections",
+      reviewedJson,
+    )
+    .option("--accept-keys", "Explicitly accept discovered keys in drafts")
+    .option(
+      "--options <json>",
+      "Metadata options declared by the installed source, applied to every batch",
+      reviewedJson,
+    );
+  command(
+    "sample",
+    "connection_sample",
+    "Read a bounded business-data preview; rows are not saved in receipts",
+  )
+    .requiredOption(
+      "--source <json>",
+      "One explicit reviewed source object",
+      reviewedJson,
+    )
+    .option("--limit <count>", "Maximum rows, 1–50 (default 20)", Number)
+    .option(
+      "--columns <json>",
+      "Array of selected source field names",
+      reviewedJson,
+    );
+  connection
+    .command("contracts <id>")
+    .description(
+      "Write isolated ODCS drafts from a current metadata receipt; does not bind or publish",
+    )
+    .requiredOption("--receipt <id>", "Source metadata receipt identity")
+    .requiredOption(
+      "--tables <json>",
+      "Array of {id,name} draft selections",
+      reviewedJson,
+    )
+    .option(
+      "--executor <reference>",
+      "Exact installed source-access provider reference",
+    )
+    .option("--accept-keys", "Explicitly accept discovered keys in drafts")
+    .action((id, options) =>
+      run("connection_contracts" as OperationName, {
+        connection: id,
+        ...options,
+      }),
+    );
+  connection
+    .command("flow-review <id>")
+    .option(
+      "--group-fields <json>",
+      "Native ingestion resource-name fields to suffix per group",
+      reviewedJson,
+    )
+    .option(
+      "--grouped",
+      "Review up to 500 tables as deterministic flow groups of at most 100",
+    )
+    .description(
+      "Preview native ingestion with shared contracts and optional local testing",
+    )
+    .requiredOption("--flow <id>", "New ingestion flow ID")
+    .requiredOption("--receipt <id>", "Current metadata receipt")
+    .option(
+      "--executor <reference>",
+      "Source-access provider used by the metadata receipt",
+    )
+    .option(
+      "--provider <name>",
+      "Explicit local provider for optional local testing",
+    )
+    .option(
+      "--runtime <reference>",
+      "Installed local provider to configure if needed",
+    )
+    .option(
+      "--target <json>",
+      "Target {provider,source,ingestion} binding for the same flow",
+      reviewedJson,
+    )
+    .requiredOption(
+      "--tables <json>",
+      "Array of {id,table,contract,receipt?} selections",
+      reviewedJson,
+    )
+    .action((id, options) => {
+      check(
+        !options.groupFields || options.grouped,
+        "OPTION",
+        "--group-fields requires --grouped",
+      );
+      run(
+        (options.grouped
+          ? "connection_flows_review"
+          : "connection_flow_review") as OperationName,
+        {
+          connection: id,
+          id: options.flow,
+          receipt: options.receipt,
+          ...(options.grouped && options.groupFields
+            ? { groupFields: options.groupFields }
+            : {}),
+          ...(options.executor ? { executor: options.executor } : {}),
+          ...(options.provider ? { provider: options.provider } : {}),
+          tables: options.tables,
+          ...(options.runtime ? { runtime: options.runtime } : {}),
+          ...(options.target ? { target: options.target } : {}),
+        },
+      );
+    });
   const contract = app.commands.find((c) => c.name() === "contract")!;
   contract.description(
     "Draft and review data contracts from supplied evidence",
@@ -101,6 +458,14 @@ export function workflowCommands(app: Command, host: Host) {
     visibleCommands: (command) =>
       command.commands.filter((c) => c.name() !== "validate"),
   });
+  contract
+    .command("locate <flow> <table>")
+    .description(
+      "Show the exact file and JSON pointer of a workflow table contract",
+    )
+    .action((flow, table) =>
+      run("contract_location" as OperationName, { flow, table }),
+    );
   // The previous flag-only draft invocation remains accepted during migration.
   contract
     .command("draft [id]")
@@ -156,6 +521,28 @@ export function workflowCommands(app: Command, host: Host) {
     .action((file) => author("contract_map_fields", readData(file)));
   const flow = app.commands.find((c) => c.name() === "flow")!;
   flow
+    .command("locate <id>")
+    .description("Show exact editable flow, table and contract locations")
+    .action((id) => run("authoring_locations" as OperationName, { flow: id }));
+  flow
+    .command("ingestion <id>")
+    .description(
+      "Preview or apply execution and table source settings together",
+    )
+    .requiredOption(
+      "--execution <json>",
+      "Installed provider execution settings",
+      reviewedJson,
+    )
+    .option("--sources <file>", "YAML/JSON table-to-source settings map")
+    .action((id, options) =>
+      author("ingestion_configure" as OperationName, {
+        flow: id,
+        execution: options.execution,
+        sources: options.sources ? readData(options.sources) : {},
+      }),
+    );
+  flow
     .command("connect <id>")
     .description("Review an explicit dataset handover")
     .requiredOption("--input <alias>", "Input alias")
@@ -168,6 +555,29 @@ export function workflowCommands(app: Command, host: Host) {
     .description("Review a shared native export group")
     .requiredOption("--group <id>", "Group owning the native resources")
     .action((id, options) => author("flow_export", { id, ...options }));
+  const schedule = flow
+    .command("schedule")
+    .description("Review durable flow schedules");
+  schedule
+    .command("show <id>")
+    .description("Inspect the saved schedule definition")
+    .action((id) => run("schedule_inspect" as OperationName, { flow: id }));
+  schedule
+    .command("edit <id>")
+    .description("Review a schedule from YAML or JSON")
+    .requiredOption("--file <file>", "Reviewed schedule definition")
+    .action((id, options) =>
+      author("schedule_propose" as OperationName, {
+        flow: id,
+        schedule: readData(options.file),
+      }),
+    );
+  schedule
+    .command("clear <id>")
+    .description("Review removal of a saved schedule")
+    .action((id) =>
+      author("schedule_propose" as OperationName, { flow: id, schedule: null }),
+    );
   flow
     .command("show <id>")
     .description("Inspect a configured flow")
@@ -337,6 +747,7 @@ export function workflowCommands(app: Command, host: Host) {
     .command("status <id>")
     .description("Read the durable local run receipt")
     .action((id) => run("run_status", { id }));
+  operationRecoveryCommand(app, execution, host);
   // Installation is explicit; browsing only inspects installed packages.
   const installPlugin = async (
     reference: string | undefined,
@@ -502,6 +913,17 @@ export function workflowCommands(app: Command, host: Host) {
     .command("list")
     .description("List locked plugin versions")
     .action(() => run("packages_list"));
+  plugin
+    .command("templates <reference> <activity>")
+    .description(
+      "Read an exported activity's templates and generator source without executing it",
+    )
+    .action((reference, activity) =>
+      run("provider_activity_inspect" as OperationName, {
+        reference,
+        activity,
+      }),
+    );
   for (const update of [false, true])
     plugin
       .command(`${update ? "update <reference>" : "install [reference]"}`)
