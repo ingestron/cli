@@ -334,7 +334,10 @@ export async function executePluginOperation(
     }
     const result = await executeAsync(context, operation, args);
     // Adapter-owned source identities are suggestions, never installed capability claims.
-    if (String(operation) === "package_library" && result.ok)
+    if (
+      ["package_library", "connector_library"].includes(String(operation)) &&
+      result.ok
+    )
       result.result.sources = Object.entries(officialPlugins).map(
         ([id, identity]) => ({
           id,

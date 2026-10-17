@@ -137,7 +137,16 @@ app
     for await (const chunk of process.stdin) {
       const value = Buffer.from(chunk);
       bytes += value.length;
-      check(bytes <= 1024 * 1024, "LIMIT", "Operation request exceeds 1 MiB");
+      check(
+        bytes <=
+          (name.startsWith("discovery_") || name.startsWith("ingestion_")
+            ? 16
+            : 1) *
+            1024 *
+            1024,
+        "LIMIT",
+        "Operation request exceeds its byte limit",
+      );
       chunks.push(value);
     }
     let request: unknown;

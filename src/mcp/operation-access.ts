@@ -8,6 +8,7 @@ const executions = new Set([
   "checkpoint_apply",
   "connection_runtime_prepare",
   "connection_test",
+  "connection_databases",
   "connection_inventory",
   "connection_metadata",
   "connection_sample",
@@ -21,6 +22,9 @@ const executions = new Set([
   "scheduler_worker_stop",
 ]);
 const writes = new Set([
+  "discovery_apply",
+  "ingestion_definition_apply",
+  "ingestion_draft_write",
   ...executions,
   "apply",
   "generate",
@@ -36,6 +40,7 @@ const writes = new Set([
   "platform_reuse_apply",
   "presentation_snapshot_apply",
   "package_install_apply",
+  "connector_change_apply",
   "provider_install_apply",
   "programme_save",
   "programme_migration_apply",

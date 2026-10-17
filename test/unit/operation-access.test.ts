@@ -23,12 +23,17 @@ test("durable scheduling and discovery require both explicit MCP permissions", (
       name,
     );
   for (const name of [
+    "ingestion_definition_read",
+    "ingestion_definition_review",
+    "ingestion_contract_check",
     "scheduler_inspect",
     "scheduler_status",
     "scheduler_history",
     "scheduler_worker_status",
     "schedule_occurrences",
     "schedule_propose",
+    "connector_library",
+    "connector_change_review",
     "connection_access",
     "run_status",
     "build_review",
@@ -42,6 +47,7 @@ test("durable scheduling and discovery require both explicit MCP permissions", (
       name,
     );
   for (const name of [
+    "ingestion_definition_apply",
     "apply",
     "build",
     "build_apply",
@@ -55,6 +61,7 @@ test("durable scheduling and discovery require both explicit MCP permissions", (
     "platform_reuse_apply",
     "presentation_snapshot_apply",
     "package_install_apply",
+    "connector_change_apply",
     "provider_install_apply",
     "programme_save",
     "programme_migration_apply",
